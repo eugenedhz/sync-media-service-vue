@@ -54,5 +54,10 @@
     "vite-tsconfig-paths": "^4.3.1",
     "vue-eslint-parser": "^9.4.2",
     "vue-tsc": "^1.8.27"
+  },
+  "lint-staged": {
+    "**/*.{ts,vue,js}": [
+        "eslint"
+    ]
   }
 }
