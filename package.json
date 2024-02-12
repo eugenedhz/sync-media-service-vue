@@ -9,9 +9,12 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore",
-    "lint:fix": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "format": "prettier --write src/",
+    "lint:vue": "eslint . --ext .vue --ignore-path .gitignore",
+    "lint:vue:fix": "eslint . --ext .vue --fix --ignore-path .gitignore",
+    "lint:ts": "eslint . --ext .ts --ignore-path .gitignore",
+    "lint:ts:fix": "eslint . --ext .ts --fix --ignore-path .gitignore",
+    "lint:all": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore",
+    "prettier": "npx prettier --write **/*.{ts,tsx,json}",
     "prepare": "husky"
   },
   "dependencies": {
