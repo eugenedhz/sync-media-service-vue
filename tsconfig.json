@@ -3,7 +3,6 @@
     "target": "esnext",
     "lib": [
       "dom",
-      "dom.iterable",
       "esnext"
     ],
     "allowJs": true,
@@ -18,9 +17,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "preserve",
     "composite": true,
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -33,4 +30,5 @@
     "src/**/*",
     "src/**/*.vue"
   ],
+  "exclude": ["node_modules"]
 }

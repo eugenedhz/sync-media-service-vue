@@ -18,6 +18,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "axios": "^1.6.7",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5"
   },
@@ -57,7 +58,7 @@
   },
   "lint-staged": {
     "**/*.{ts,vue,js}": [
-        "eslint"
+      "eslint"
     ]
   }
 }

@@ -9,6 +9,7 @@ module.exports = {
         'plugin:vue/vue3-essential',
         'plugin:vue/vue3-strongly-recommended',
         'plugin:vue/vue3-recommended',
+        '@vue/eslint-config-typescript',
         'airbnb',
         'prettier',
     ],
@@ -29,12 +30,26 @@ module.exports = {
     rules: {
         'vue/multi-word-component-names': 'off',
         'vue/valid-template-root': 'off',
-        'unused-imports/no-unused-imports': 'error',
-        'import/no-unresolved': 'off',
-        'import/prefer-default-export': 'off',
+        'semi': 'error',
+        'quotes': [2, 'single', { 'avoidEscape': true }],
+        'indent': ['error', 4],
         'object-curly-newline': 'off',
         'no-unused-vars': 'warn',
         'no-shadow': 'off',
+        'no-underscore-dangle': 'off',
+        'no-param-reassign': 'off',
+        'no-undef': 'off',
+        'linebreak-style': 'off',
+        'max-len': [
+            'error',
+            {
+                ignoreComments: true,
+                code: 140,
+            },
+        ],
+        'unused-imports/no-unused-imports': 'error',
+        'import/prefer-default-export': 'off',
+        'import/no-unresolved': 'off',
         'import/order': [
             'error',
             {
@@ -54,17 +69,6 @@ module.exports = {
         ],
         'import/extensions': 'off',
         'import/no-extraneous-dependencies': 'off',
-        'no-underscore-dangle': 'off',
-        'max-len': [
-            'error',
-            {
-                ignoreComments: true,
-                code: 140,
-            },
-        ],
-        'no-param-reassign': 'off',
-        'linebreak-style': 'off',
-        'no-undef': 'off',
         'heildionis-plugin/path-checker': [2, { alias: '@' }],
         'heildionis-plugin/public-api-imports': [
             'error',
