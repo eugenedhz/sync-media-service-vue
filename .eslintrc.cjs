@@ -12,13 +12,14 @@ module.exports = {
         'airbnb',
         'prettier',
     ],
-    parser: '@typescript-eslint/parser',
+    parser:  'vue-eslint-parser',
     parserOptions: {
         ecmaFeatures: {
-            jsx: true,
+            jsx: false,
         },
         ecmaVersion: 'latest',
         sourceType: 'module',
+        parser: '@typescript-eslint/parser'
     },
     plugins: [
         '@typescript-eslint',
@@ -26,13 +27,9 @@ module.exports = {
         'unused-imports',
     ],
     rules: {
+        'vue/multi-word-component-names': 'off',
+        'vue/valid-template-root': 'off',
         'unused-imports/no-unused-imports': 'error',
-        'react/jsx-filename-extension': [
-            2,
-            {
-                extensions: ['.js', '.jsx', '.tsx'],
-            },
-        ],
         'import/no-unresolved': 'off',
         'import/prefer-default-export': 'off',
         'object-curly-newline': 'off',
@@ -65,11 +62,8 @@ module.exports = {
                 code: 140,
             },
         ],
-        'jsx-quotes': ['error', 'prefer-single'],
         'no-param-reassign': 'off',
         'linebreak-style': 'off',
-        'jsx-a11y/click-events-have-key-events': 'off',
-        'jsx-a11y/no-static-element-interactions': 'off',
         'no-undef': 'off',
         'heildionis-plugin/path-checker': [2, { alias: '@' }],
         'heildionis-plugin/public-api-imports': [
