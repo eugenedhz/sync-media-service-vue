@@ -2,7 +2,10 @@
 import { defineComponent } from 'vue';
 
 defineComponent({
-    
+    data() {
+        const a = 0;
+        console.log(a)
+    }
 })
 </script>
 
