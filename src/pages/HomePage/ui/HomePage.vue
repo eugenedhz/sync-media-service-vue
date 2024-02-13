@@ -1,6 +1,7 @@
 <template>
     <h1>Media</h1>
     {{ message }}
+    <h2>Service</h2>
 </template>
 
 <script lang="ts">
