@@ -6,6 +6,6 @@ import { __IS_DEV__ } from '@/shared/config/environment';
 
 export const store = createStore<StateSchema>({
     modules: {},
-    strict: !!__IS_DEV__,
+    strict: true,
     devtools: !!__IS_DEV__
 });

@@ -84,7 +84,7 @@ module.exports = {
             {
                 alias: '@',
                 ignoreImportPatterns: [
-                    '**/StoreProvider',
+                    '**/store',
                     '**/testing',
                     '**/componentRender',
                 ],
