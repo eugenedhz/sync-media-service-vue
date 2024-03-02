@@ -1,35 +1,15 @@
 <template>
-    <DynamicModuleLoader :modules="modules">
-        {{ message }}
-    </DynamicModuleLoader>
+    {{ counter.doubleCount }}
+    <button @click="counter.increment()">inc</button>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { useCounterStore } from '../model/counterStore';
 
-import { exampleModule } from '../model/exampleModule';
+const counter = useCounterStore();
 
-import { __BASE_URL__, __IS_DEV__ } from '@/shared/config/environment';
-import { DynamicModuleLoader, ModuleList } from '@/shared/lib/hooks';
-
-export const modules: ModuleList = {
-    example: exampleModule
-};
-
-export default defineComponent({
-    components: {
-        DynamicModuleLoader
-    },
-    data() {
-        return {
-            message: __BASE_URL__,
-            isDev: __IS_DEV__,
-            modules
-        };
-    },
-});
 </script>
 
 <style>
 @import './HomePage';
-</style>
+</style>../model/exampleStore
