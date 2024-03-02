@@ -37,6 +37,8 @@ module.exports = {
         'no-unused-vars': 'warn',
         'no-shadow': 'off',
         'no-underscore-dangle': 'off',
+        'no-useless-constructor': 'off',
+        'no-empty-function': 'off',
         'no-param-reassign': 'off',
         'no-undef': 'off',
         'linebreak-style': 'off',
