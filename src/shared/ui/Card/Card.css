@@ -1,0 +1,23 @@
+.card {
+    width: 100px;
+    height: 100px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+    border-radius: 10px;
+}
+
+.glass {
+    background: rgb(var(--qwarz-dark-secondary-value) / 30%);
+    border: var(--border-sm) solid rgb(var(--qwarz-light-tertiary-value) / 20%);
+    backdrop-filter: var(--blur);
+}
+
+.qwartz {
+    background: var(--qwarz-light-primary);
+    border: var(--border-md) solid var(--qwarz-light-primary);
+}
+
+.framed {
+    border: var(--border-md) solid var(--qwarz-light-primary);
+    background: rgb(var(--qwarz-light-primary-value) / 1%);
+}

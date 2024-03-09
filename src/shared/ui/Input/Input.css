@@ -1,0 +1,27 @@
+input {
+    backdrop-filter: var(--blur);
+    box-shadow: var(--shadow);
+    padding: 8px 16px;
+    background: rgb(var(--qwarz-dark-secondary-value) / 30%);
+    border: var(--border-sm) solid rgb(var(--qwarz-light-tertiary-value) / 20%);
+    color: rgb(var(--qwarz-light-primary-value) / 80%);
+    font: var(--font-s);
+    font-weight: 600;
+    text-shadow: var(--text-shadow);
+    border-radius: 10px;
+    outline: none;
+}
+
+input::placeholder {
+    color: rgb(var(--qwarz-light-primary-value) / 80%);
+}
+
+.full-width {
+    width: 100%;
+}
+
+.disabled {
+    cursor: not-allowed;
+    background: rgb(var(--qwarz-dark-secondary-value) / 80%);
+    color: rgb(var(--qwarz-light-primary-value) / 60%);
+}

@@ -7,3 +7,9 @@ type OptionalRecord<K extends keyof any, T> = {
 };
 
 type ValueOf<T> = T[keyof T];
+
+declare module '*.css' {
+    type ClassNames = Record<string, string>;
+    const classNames: ClassNames;
+    export = classNames;
+}

@@ -1,0 +1,1 @@
+export type EventProp<T extends any[] = any[], F = (...args: T) => void> = F

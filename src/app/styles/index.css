@@ -1,3 +1,9 @@
+@import url('./variables/global.css');
+@import url('./fonts.css');
+@import url('./reset.css');
+
 body {
-    font-family: Consolas;
+    font: var(--font-m);
+    background-color: var(--qwarz-dark-primary);
+    margin: 0 auto;
 }
