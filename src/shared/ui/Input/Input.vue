@@ -1,24 +1,54 @@
 <script lang="ts" setup>
 import { defineProps } from 'vue';
 
+defineEmits(['update:modelValue', 'iconClick']);
 const props = defineProps({
     disabled: {
         type: Boolean,
-        default: undefined,
+        default: undefined
     },
     fullWidth: {
+        type: Boolean
+    },
+    modelValue: {
+        type: String,
+        default: ''
+    },
+    placeholder: {
+        type: String,
+        default: ''
+    },
+    iconShown: {
         type: Boolean,
+        default: false
     }
 });
 
 const classes = {
     'full-width': props.fullWidth,
-    'disabled': props.disabled,
 };
 </script>
 
 <template>
-    <input :disabled="disabled" :class="classes"/>
+    <div class="input-container" :disabled="disabled" :class="{ disabled: props.disabled }">
+        <input
+            :disabled="disabled"
+            :class="classes"
+            :value="modelValue"
+            :placeholder="placeholder"
+            @input="
+                $emit(
+                    'update:modelValue',
+                    ($event.target as HTMLInputElement).value
+                )
+            "
+        />
+        <template v-if="iconShown">
+            <button @click="$emit('iconClick')">
+                <slot></slot>
+            </button>
+        </template>
+    </div>
 </template>
 
 <style lang="css" scoped>

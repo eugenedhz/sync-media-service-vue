@@ -1,31 +1,26 @@
 <script lang="ts" setup>
 import { defineEmits, defineProps } from 'vue';
 
-
-defineEmits(['update:modelValue']);
-const props = defineProps({
+defineEmits(['check']);
+defineProps({
     name: {
         type: String,
         default: 'checkbox',
         required: true
     },
-    modelValue: {
-        type: Boolean,
-        default: false
+    checked: {
+        type: Boolean
     }
 });
-
-
 </script>
 
 <template>
-    <label :for="name" :title="name">
+    <label :for="name" :title="name" >
         <input
             :id="name"
             class="checkbox"
             type="checkbox"
-            :value="modelValue"
-            @change="$emit('update:modelValue', !modelValue)"
+            @change="$emit('check', { name, checked })"
         />
         <span class="dot"></span>
     </label>

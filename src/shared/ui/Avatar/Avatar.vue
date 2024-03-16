@@ -1,8 +1,18 @@
 <script setup lang="ts">
+defineProps({
+    width: {
+        type: Number,
+        default: 55
+    },
+    height: {
+        type: Number,
+        default: 55
+    }
+});
 </script>
 
 <template>
-    <img/>
+    <img :width="width" :height="height"/>
 </template>
 
 

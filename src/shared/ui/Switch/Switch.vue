@@ -3,6 +3,10 @@ import { Switch } from '@headlessui/vue';
 
 defineProps({
     modelValue: {
+        type: Boolean,
+        required: true
+    },
+    value: {
         type: String,
         required: true
     }
@@ -14,7 +18,7 @@ defineEmits(['update:modelValue']);
     <Switch
         class="switcher"
         :class="modelValue && 'switcher-enabled'"
-        :value="modelValue"
+        :value="value"
         @click="$emit('update:modelValue', !modelValue)"
     >
         <span

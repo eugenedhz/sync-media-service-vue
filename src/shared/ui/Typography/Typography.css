@@ -1,0 +1,64 @@
+.typography {
+    color: var(--qwarz-light-primary);
+    font: var(--font-m);
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.size-sm {
+    font: var(--font-s);
+}
+
+.size-md {
+    font: var(--font-m);
+}
+
+.size-lg {
+    font: var(--font-l);
+}
+
+.size-xl {
+    font: var(--font-xl);
+}
+
+.size-xxl {
+    font: var(--font-xxl);
+}
+
+.align-auto {
+    text-align: auto;
+}
+
+.align-start {
+    text-align: start;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.align-end {
+    text-align: end;
+}
+
+.align-justify {
+    text-align: justify;
+}
+
+.weight-400 {
+    font-weight: 400;   
+}
+
+.weight-500 {
+    font-weight: 500;   
+}
+
+.weight-600 {
+    font-weight: 600;   
+}
+
+.weight-700 {
+    font-weight: 700;   
+}

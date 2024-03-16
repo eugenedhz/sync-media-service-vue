@@ -43,5 +43,4 @@ const classes = {
 
 <style lang="css" scoped>
 @import url('./Button.css');
-
 </style>

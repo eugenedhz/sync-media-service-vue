@@ -1,8 +1,5 @@
 .card {
-    width: 100px;
-    height: 100px;
     box-shadow: var(--shadow);
-    padding: 16px;
     border-radius: 10px;
 }
 
@@ -13,11 +10,19 @@
 }
 
 .qwartz {
-    background: var(--qwarz-light-primary);
-    border: var(--border-md) solid var(--qwarz-light-primary);
+    background: var(--qwarz-dark-primary);
+    border: var(--border-md) solid var(--qwarz-dark-primary);
 }
 
 .framed {
     border: var(--border-md) solid var(--qwarz-light-primary);
     background: rgb(var(--qwarz-light-primary-value) / 1%);
+}
+
+.with-padding {
+    padding: 16px;
+}
+
+.full-width {
+    width: 100%;
 }

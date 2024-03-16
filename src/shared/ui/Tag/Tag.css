@@ -6,7 +6,7 @@ span {
     backdrop-filter: var(--blur);
     padding: 4px 16px;
     border: var(--border-sm) solid var(--qwarz-dark-secondary);
-    color: rgb(var(--qwarz-light-primary-value) / 30%);
+    color: rgb(var(--qwarz-light-primary-value) / 80%);
     text-align: center;
     text-shadow: var(--text-shadow);
 }

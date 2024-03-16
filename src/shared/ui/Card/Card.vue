@@ -10,11 +10,21 @@ const props = defineProps({
     },
     framed: {
         type: Boolean
+    },
+    fullWidth: {
+        type: Boolean,
+        default: false
+    },
+    withPadding: {
+        type: Boolean,
+        default: true
     }
 });
 
 const classes = {
     [props.material]: true,
+    'full-width': props.fullWidth,
+    'with-padding': props.withPadding,
     'framed': props.framed
 };
 
