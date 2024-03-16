@@ -1,0 +1,27 @@
+.checkbox {
+    pointer-events: none;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+label {
+    display: grid;
+    place-items: center;
+    user-select: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 11px;
+    border: var(--border-md) solid var(--qwarz-light-primary);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+}
+
+label .checkbox:checked  + .dot {
+    width: 14px;
+    height: 14px;
+    background-color: var(--qwarz-light-primary);
+    border-radius: 6px;
+}
+

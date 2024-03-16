@@ -1,0 +1,33 @@
+.switcher {
+    position: relative;
+    height: 24px;
+    width: 50px;
+    flex-shrink: 0;
+    cursor: pointer;
+    border-radius: 11px;
+    padding: 2px;
+    background: none;
+    border: var(--border-md) solid var(--qwarz-light-primary);
+    box-shadow: var(--shadow);
+}
+
+.switcher-enabled {
+    backdrop-filter: var(--blur);
+    box-shadow: var(--switch-shadow);
+}
+
+.switch {
+    pointer-events: none;
+    height: 14px;
+    width: 20px;
+    transition: .2s cubic-bezier(.4, 0, .2, 1);
+    border-radius: 11px;
+    cursor: pointer;
+    position: relative;
+    background-color: var(--qwarz-light-primary);
+    display: block;
+}
+
+.enabled {
+    transform: translateX(100%);
+}

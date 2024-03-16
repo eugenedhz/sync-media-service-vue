@@ -1,5 +1,7 @@
 <template>
-    <router-view />
+    <div style="max-width: 1296px; margin: 0 auto;">
+        <router-view />
+    </div>
 </template>
 
 <script lang="ts">

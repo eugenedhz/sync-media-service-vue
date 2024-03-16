@@ -1,0 +1,16 @@
+span {
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    background: rgba(var(--qwarz-light-secondary-value) 0.3);
+    backdrop-filter: var(--blur);
+    padding: 4px 16px;
+    border: var(--border-sm) solid var(--qwarz-dark-secondary);
+    color: rgb(var(--qwarz-light-primary-value) / 80%);
+    text-align: center;
+    text-shadow: var(--text-shadow);
+}
+
+.full-width {
+    width: 100%;
+}
