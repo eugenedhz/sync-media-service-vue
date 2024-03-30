@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineProps } from 'vue';
+import { computed, defineProps } from 'vue';
 
 defineEmits(['update:modelValue', 'iconClick']);
 const props = defineProps({
@@ -24,13 +24,13 @@ const props = defineProps({
     }
 });
 
-const classes = {
+const classes = computed(() => ({
     'full-width': props.fullWidth,
-};
+}));
 </script>
 
 <template>
-    <div class="input-container" :disabled="disabled" :class="{ disabled: props.disabled }">
+    <div class="input-container" :disabled="disabled" :class="{ disabled: props.disabled, ...classes }">
         <input
             :disabled="disabled"
             :class="classes"

@@ -1,4 +1,4 @@
-.checkbox {
+input {
     pointer-events: none;
     opacity: 0;
     width: 0;
@@ -7,8 +7,10 @@
 }
 
 label {
-    display: grid;
-    place-items: center;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     user-select: none;
     width: 24px;
     height: 24px;
@@ -18,10 +20,25 @@ label {
     box-shadow: var(--shadow);
 }
 
-label .checkbox:checked  + .dot {
+.background {
+    position: absolute;
+    user-select: none;
+    border-radius: 11px;
+    cursor: pointer;
+    width: 21px;
+    height: 21px;
+    backdrop-filter: var(--blur-clear);
+    z-index: -1;
+    transition: backdrop-filter var(--transition-speed-medium);
+}
+
+label .checkbox:checked + .dot {
     width: 14px;
     height: 14px;
     background-color: var(--qwarz-light-primary);
     border-radius: 6px;
 }
 
+label .checkbox:checked + .dot + .background {
+    backdrop-filter: var(--blur);
+}

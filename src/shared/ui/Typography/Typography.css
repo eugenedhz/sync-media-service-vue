@@ -3,6 +3,14 @@
     font: var(--font-m);
 }
 
+.primary {
+    color:  var(--qwarz-light-primary);
+}
+
+.typographyle {
+    color: rgb(var(--qwarz-light-primary-value) / 30%)
+}
+
 .uppercase {
     text-transform: uppercase;
 }

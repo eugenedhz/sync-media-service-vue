@@ -1,7 +1,8 @@
+/* stylelint-disable value-no-vendor-prefix */
 button {
     border-radius: 15px;
-    padding: 10px 16px;
-    transition: .3s;
+    padding: 8px 16px;
+    transition: backdrop-filter var(--transition-speed-medium);
     box-shadow: var(--shadow);
     border-width: var(--border-md);
     border-style: solid;
@@ -9,6 +10,8 @@ button {
     font: var(--font-m);
     font-weight: 600;
     color: var(--qwarz-light-primary);
+    text-shadow: var(--shadow);
+    display: block;
 }
 
 .cleared {
@@ -18,6 +21,7 @@ button {
 }
 
 .filled {
+    transition: var(--transition-speed-fast);
     background-color: var(--qwarz-light-primary);
     border-color: var(--qwarz-light-primary);
     color: var(--qwarz-dark-primary);
@@ -26,41 +30,53 @@ button {
 .filled:hover:enabled {
     background-color: var(--qwarz-light-secondary);
     border-color: var(--qwarz-light-secondary);
+    color: var(--qwarz-dark-secondary);
 }
 
-.filled:focus:enabled,
+/* .filled:focus:enabled, */
 .filled:active:enabled  {
     background-color: var(--qwarz-light-tertiary);
     border-color: var(--qwarz-light-tertiary);
+    color: var(--qwarz-dark-primary);
 }
 
 .outlined {
+    transition: var(--transition-speed-fast);
     border-color: var(--qwarz-light-primary);
-    background: none;
+    background: transparent;
 }
 
 .outlined:hover:enabled {
     border-color: var(--qwarz-light-secondary);
+    color: var(--qwarz-light-secondary);
 }
 
-.outlined:focus:enabled,
+/* .outlined:focus:enabled, */
 .outlined:active:enabled {
     border-color: var(--qwarz-light-tertiary);
+    color: var(--qwarz-light-tertiary);
 }
 
 .blured {
+    transition: backdrop-filter var(--transition-speed-medium);
     border-color: var(--qwarz-light-primary);
-    backdrop-filter: var(--blur) opacity(0.9);
-    background: none;
+    backdrop-filter: var(--blur);
+    background: transparent;
 }
 
 .blured:hover:enabled {
-    backdrop-filter: var(--blur-hover) opacity(1);
+    transition: backdrop-filter var(--transition-speed-medium);
+    backdrop-filter: var(--blur-hover);
+    border-color: var(--qwarz-light-secondary);
+    color: var(--qwarz-light-secondary);
 }
 
-.blured:focus:enabled,
+/* .blured:focus:enabled, */
 .blured:active:enabled {
+    transition: backdrop-filter var(--transition-speed-medium);
     backdrop-filter: var(--blur-press);
+    border-color: var(--qwarz-light-tertiary);
+    color: var(--qwarz-light-tertiary);
 }
 
 .filled:hover:enabled,
@@ -69,9 +85,10 @@ button {
     box-shadow: var(--shadow-hover);
 }
 
+/* 
 .filled:focus:enabled,
 .outlined:focus:enabled,
-.blured:focus:enabled,
+.blured:focus:enabled, */
 .filled:active:enabled,
 .outlined:active:enabled,
 .blured:active:enabled {

@@ -23,6 +23,7 @@ defineProps({
             @change="$emit('check', { name, checked })"
         />
         <span class="dot"></span>
+        <span class="background"></span>
     </label>
 </template>
 
