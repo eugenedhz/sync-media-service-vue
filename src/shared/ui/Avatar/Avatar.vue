@@ -1,12 +1,12 @@
 <script setup lang="ts">
 defineProps({
     width: {
-        type: Number,
-        default: 55
+        type: String,
+        default: '55px'
     },
     height: {
-        type: Number,
-        default: 55
+        type: String,
+        default: '55px'
     }
 });
 </script>

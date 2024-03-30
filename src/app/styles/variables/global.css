@@ -19,9 +19,9 @@
     --font-xxl: var(--font-size-xxl) / var(--font-line-xxl) var(--font-family-main);
 
     /* Light */
-    --qwarz-light-primary-value: 248 252 252;
-    --qwarz-light-secondary-value: 207 207 207;
-    --qwarz-light-tertiary-value: 180 182 182;
+    --qwarz-light-primary-value: 243 243 243;
+    --qwarz-light-secondary-value: 248 252 252;
+    --qwarz-light-tertiary-value: 207 207 207;
 
     /* Dark */
     --qwarz-dark-primary-value: 23 23 23;
@@ -29,9 +29,9 @@
     --qwarz-dark-tertiary-value: 3 3 3;
 
     /* Light */
-    --qwarz-light-primary: rgb(248 252 252);
-    --qwarz-light-secondary: rgb(207 207 207);
-    --qwarz-light-tertiary: rgb(180 182 182);
+    --qwarz-light-primary: rgb(243 243 243);
+    --qwarz-light-secondary: rgb(248 252 252);
+    --qwarz-light-tertiary: rgb(207 207 207);
 
     /* Dark */
     --qwarz-dark-primary: rgb(23 23 23);
@@ -40,13 +40,14 @@
 
     /* Blurs */
     --blur: blur(10px);
+    --blur-clear: blur(0px);
     --blur-hover: blur(12px);
     --blur-press: blur(5.3px);
 
     /* Shadows */
-    --shadow: 2px 2px 5px 0 rgb(0 0 0 / 25.1%);
-    --shadow-hover: 3px 3px 5px 1px rgb(30 30 30 / 20%);
-    --shadow-press:  0 0 5px 0 rgb(30 30 30 / 20%);
+    --shadow: 0px 0px 4px 0 rgb(23 23 23 / 25%);
+    --shadow-hover: 0 0 5px 0 rgb(23 23 23 / 20%);
+    --shadow-press:  0 0 3px 0 rgb(23 23 23 / 20%);
     --text-shadow: 1px 1px 5px 0 rgb(23 23 23 / 25%);
     --switch-shadow: 0 4px 4px 0 rgb(0 0 0 / 25%);
 
@@ -56,4 +57,9 @@
 
     /* Indexes */
     --select-z-index: 50;
+
+    /* Transition */
+    --transition-speed-fast: .2s;
+    --transition-speed-medium: .75s;
+    --transition-speed-slow: 1s;
 }

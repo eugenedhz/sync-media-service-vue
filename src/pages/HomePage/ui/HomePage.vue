@@ -1,7 +1,7 @@
 <template>
     {{ counter.doubleCount }}
     <hr />
-    <Button @click="counter.increment()">SIGN UP</Button>
+    <Button :type="'submit'" @click="counter.increment()">SIGN UP</Button>
     <hr />
     <Button :variant="'outlined'" @click="counter.increment()">SIGN UP</Button>
     <hr />
@@ -39,14 +39,14 @@
         <Dropdown></Dropdown>
     </div>
     <div>
-        <Input v-model="checkboxes.input" full-width :placeholder="'Search..'" icon-shown @icon-click="() => console.log(input)">
+        <Input v-model="checkboxes.input" :placeholder="'Search..'" icon-shown @icon-click="() => console.log(input)">
             <Sample/>
         </Input>
         {{ checkboxes.inp }}
         <Button full-width>Sign in</Button>
     </div>
     <Switch v-model="enabled" :value="'valuye'" />
-    <div style="display: flex">
+    <div style="display:flex">
         <Checkbox
             v-for="checkbox in checkboxes.checkbox"
             :key="checkbox.name"
@@ -57,10 +57,10 @@
     </div>
     <div style="display: flex">
         <Row :gap="'32'" full-width>
-            <Card :material="'qwartz'" />
-            <Card :material="'qwartz'" framed />
-            <Card></Card>
-            <Card framed />
+            <Card :width="'100px'" height="100px" :material="'qwartz'" />
+            <Card :width="'100px'" height="100px" :material="'qwartz'" framed />
+            <Card :width="'100px'" height="100px"></Card>
+            <Card :width="'100px'" height="100px" framed />
         </Row>
         <Column>
             <Card :material="'qwartz'" framed />

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+import { PropType, computed } from 'vue';
 
 export type FlexJustify = 'start' | 'center' | 'end' | 'between';
 export type FlexAlign = 'start' | 'center' | 'end';
@@ -53,13 +53,13 @@ const gapClasses: Record<FlexGap, string> = {
     32: 'gap32',
 };
 
-const classes = {
+const classes = computed(() => ({
     [justifyClasses[props.justify]]: true,
     [alignClasses[props.align]]: true,
     [directionClasses[props.direction]]: true,
     [gapClasses[props.gap]]: true,
     'full-width': props.fullWidth
-};
+}));
 </script>
 
 <template>

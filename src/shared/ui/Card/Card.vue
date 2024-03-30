@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+import { PropType, computed } from 'vue';
 
 export type CardMaterial = 'glass' | 'qwartz';
 
@@ -18,20 +18,28 @@ const props = defineProps({
     withPadding: {
         type: Boolean,
         default: true
+    },
+    width: {
+        type: String,
+        default: 'auto'
+    },
+    height: {
+        type: String,
+        default: 'auto'
     }
 });
 
-const classes = {
+const classes = computed(() => ({
     [props.material]: true,
     'full-width': props.fullWidth,
     'with-padding': props.withPadding,
     'framed': props.framed
-};
+}));
 
 </script>
 
 <template>
-    <div class="card" :class="classes">
+    <div class="card" :width="width" :height="height" :class="classes">
         <slot></slot>
     </div>
 </template>
