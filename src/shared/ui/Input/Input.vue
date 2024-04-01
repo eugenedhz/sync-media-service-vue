@@ -21,6 +21,10 @@ const props = defineProps({
     iconShown: {
         type: Boolean,
         default: false
+    },
+    typeInput: {
+        type: String,
+        default: 'text'
     }
 });
 
@@ -30,12 +34,13 @@ const classes = {
 </script>
 
 <template>
-    <div class="input-container" :disabled="disabled" :class="{ disabled: props.disabled }">
+    <div class="input-container" :disabled="disabled" :class="{ disabled: props.disabled, 'full-width': props.fullWidth }">
         <input
             :disabled="disabled"
             :class="classes"
             :value="modelValue"
             :placeholder="placeholder"
+            :type="typeInput"
             @input="
                 $emit(
                     'update:modelValue',
@@ -44,7 +49,7 @@ const classes = {
             "
         />
         <template v-if="iconShown">
-            <button @click="$emit('iconClick')">
+            <button type="button" @click="$emit('iconClick')">
                 <slot></slot>
             </button>
         </template>

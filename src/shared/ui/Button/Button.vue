@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+import { PropType, computed } from 'vue';
 
 const buttonVariants = {
     FILLED: 'filled',
@@ -27,12 +27,19 @@ const props = defineProps({
     }
 });
 
-const classes = {
+const classes = computed(() => ({
     'full-width': props.fullWidth,
-    'disabled': props.disabled,
-    'square': props.square,
-    [props.variant]: true,
-};
+    disabled: props.disabled,
+    square: props.square,
+    [props.variant]: true
+}));
+
+// const classes = {
+//     'full-width': props.fullWidth,
+//     'disabled': props.disabled,
+//     'square': props.square,
+//     [props.variant]: true,
+// };
 </script>
 
 <template>
