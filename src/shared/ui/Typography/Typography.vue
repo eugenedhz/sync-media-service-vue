@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+import { PropType, computed } from 'vue';
 
 export type TypographySize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 export type TypographyAlign = 'auto' | 'start' | 'center' | 'end' | 'justify';
-export type TypographyWeight = 400 | 500 | 600 | 700
+export type TypographyWeight = 400 | 500 | 600 | 700;
+export type TypographyColor = 'primary' | 'pale';
 
 const props = defineProps({
+    color: {
+        type: String as PropType<TypographyColor>,
+        default: 'primary'
+    },
     size: {
         type: String as PropType<TypographySize>,
         default: 'md'
@@ -53,13 +58,13 @@ const textWeight: Record<TypographyWeight, string> = {
     700: 'weight-700'
 };
 
-const classes = {
+const classes = computed(() => ({
     [textWeight[props.weight]]: true,
     [textAlign[props.align]]: true,
     [textSize[props.size]]: true,
     'uppercase': props.uppercase,
     'full-width': props.fullWidth,
-};
+}));
 </script>
 
 <template>

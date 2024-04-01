@@ -1,13 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 const props = defineProps({
     fullWidth: {
         type: Boolean,
     }
 });
 
-const classes = {
+const classes = computed(() => ({
     'full-width': props.fullWidth,
-};
+}));
 </script>
 
 <template>

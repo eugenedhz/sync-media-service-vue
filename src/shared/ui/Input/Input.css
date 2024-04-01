@@ -1,11 +1,11 @@
 input {
     background: none;
     border: none;
-    color: rgb(var(--qwarz-light-primary-value) / 80%);
     font: var(--font-s);
     font-weight: 600;
     text-shadow: var(--text-shadow);
     outline: none;
+    color: var(--qwarz-light-primary);
 }
 
 input::placeholder {
@@ -17,8 +17,8 @@ input::placeholder {
     gap: 16px;
     backdrop-filter: var(--blur);
     box-shadow: var(--shadow);
-    background: rgb(var(--qwarz-dark-secondary-value) / 30%);
-    border: var(--border-sm) solid rgb(var(--qwarz-light-tertiary-value) / 20%);
+    background: rgb(var(--qwarz-dark-primary-value) / 25%);
+    border: var(--border-sm) solid rgb(var(--qwarz-light-tertiary-value) / 30%);
     border-radius: 15px;
     padding: 10px 12px;
 }

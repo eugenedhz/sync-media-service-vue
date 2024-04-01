@@ -29,17 +29,10 @@ const props = defineProps({
 
 const classes = computed(() => ({
     'full-width': props.fullWidth,
-    disabled: props.disabled,
-    square: props.square,
-    [props.variant]: true
+    'disabled': props.disabled,
+    'square': props.square,
+    [props.variant]: true,
 }));
-
-// const classes = {
-//     'full-width': props.fullWidth,
-//     'disabled': props.disabled,
-//     'square': props.square,
-//     [props.variant]: true,
-// };
 </script>
 
 <template>

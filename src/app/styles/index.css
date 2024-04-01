@@ -4,6 +4,6 @@
 
 body {
     font: var(--font-m);
-    background-color: var(--qwarz-dark-primary);
-    margin: 0 auto;
+    background-image: url('https://images-ext-2.discordapp.net/external/SATxOggmd9exjHmXJxAsO4B7d4dqLjb_i8fTfHYPLfM/https/img.freepik.com/premium-vector/chess-cells-background-black-squares-with-white-texture-geometric-surface-repeat_573660-285.jpg?format=webp&width=688&height=387');
+    margin: 0 auto
 }

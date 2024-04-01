@@ -19,10 +19,11 @@
     backdrop-filter: var(--blur);
     font-weight: 600;
     color: var(--qwarz-light-primary);
+    text-shadow: var(--text-shadow);
     background-color: rgb(var(--qwarz-light-primary-value) / 1%);
     border-radius: 10px;
     cursor: pointer;
-    transition: .3s;
+    transition: var(--transition-speed-fast);
 }
 
 .button:active,
