@@ -19,17 +19,33 @@
         </Typography>
         <form @submit.prevent="authTypeContent.authFunc">
             <Column :gap="'16'" full-width>
+                <Column v-if="errorsServer.size">
+                    <Typography
+                        v-for="error in errorsServer"
+                        :key="error"
+                        :weight="400"
+                        :as="'p'"
+                        :size="'sm'"
+                    >
+                        {{ error }}
+                    </Typography>
+                </Column>
                 <Row :gap="'16'" full-width :justify="'between'">
                     <Input
                         v-model="username"
                         :placeholder="'Login'"
                         full-width
+                        @input="validationAuthFields('username', username)"
+                        @click="validationAuthErrorClear('username')"
                     />
                     <Input
                         v-if="authTypeContent.authType === 'signup'"
                         v-model="displayName"
                         :placeholder="'Name'"
                         full-width
+                        @input="
+                            validationAuthFields('displayName', displayName)
+                        "
                     />
                 </Row>
                 <Input
@@ -38,6 +54,7 @@
                     :placeholder="'example@ilow.me'"
                     :type-input="'email'"
                     full-width
+                    @click="validationAuthErrorClear('email')"
                 />
                 <Input
                     v-model="password"
@@ -52,6 +69,17 @@
                                     ? 'text'
                                     : 'password')
                     "
+                    @input="
+                        validationAuthFields('password', password);
+                        authTypeContent.authType === 'signup'
+                            ? validationAuthFields(
+                                  'repeatPassword',
+                                  password,
+                                  repeatPassword
+                              )
+                            : null;
+                    "
+                    @click="validationAuthErrorClear('password')"
                 />
                 <Input
                     v-if="authTypeContent.authType === 'signup'"
@@ -67,18 +95,25 @@
                                     ? 'text'
                                     : 'password')
                     "
-                />
-                <Typography
-                    v-if="
-                        password !== repeatPassword &&
-                        authTypeContent.authType === 'signup'
+                    @input="
+                        validationAuthFields(
+                            'repeatPassword',
+                            password,
+                            repeatPassword
+                        )
                     "
-                    :weight="400"
-                    :as="'p'"
-                    :align="'center'"
-                    :size="'sm'"
-                    >Error! Passwords do not match!</Typography
-                >
+                />
+                <Column v-if="errorsFields.size">
+                    <Typography
+                        v-for="error in errorsFields"
+                        :key="error"
+                        :weight="400"
+                        :as="'p'"
+                        :size="'sm'"
+                    >
+                        {{ error }}
+                    </Typography>
+                </Column>
             </Column>
             <Button
                 :disabled="!authFilled.value"
@@ -98,14 +133,18 @@
             @click="authTypeForLink"
             >{{ authTypeContent.linkText }}
         </Typography>
-
-        <!-- <Button @click="logout">LOG OUT</Button>
-        потом убрать -->
     </div>
 </template>
 <script setup lang="ts">
 import { ref, computed, PropType } from 'vue';
 
+import {
+    validationAuthFields,
+    validationAuth,
+    validationAuthErrorClear,
+    errorsFields,
+    errorsServer
+} from '../lib/validators/validationHandler';
 import { useAuthStore } from '../model/authStore';
 
 import { Input, Row, Column, Button, Typography } from '@/shared/ui';
@@ -138,7 +177,7 @@ async function authSignup() {
             username.value
         );
     } catch (error) {
-        console.error('Signup failed: ', error);
+        validationAuth(error);
     }
 }
 
@@ -146,7 +185,7 @@ async function authLogin() {
     try {
         await authStore.login(password.value, username.value);
     } catch (error) {
-        console.error('Login failed: ', error);
+        validationAuth(error);
     }
 }
 
@@ -196,14 +235,6 @@ function authTypeForLink() {
             ? loginContent
             : signupContent;
 }
-
-// async function logout() {
-//     try {
-//         await authStore.logout();
-//     } catch (error) {
-//         console.error('Logout failed: ', error);
-//     }
-// }
 </script>
 <style>
 @import 'AuthForm.css';

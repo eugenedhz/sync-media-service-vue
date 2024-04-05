@@ -22,15 +22,14 @@ api.interceptors.response.use(
         if (isStatusUnauthorized && isSameRequest && !isRetry) {
             originalRequest._isRetry = true;
             try {
-                await axios.post(
-                    'https://ilow-api.eugenv.ru/auth/refresh',
+                await api.post(
+                    '/auth/refresh',
                     {},
                     { withCredentials: true }
                 );
-                console.log('aaaa');
                 return api.request(originalRequest);
             } catch (e) {
-                console.log('Refresh token error: ', e);
+                console.error('Refresh token error: ', e);
             }
         }
         throw error;
