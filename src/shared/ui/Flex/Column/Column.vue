@@ -25,7 +25,7 @@ defineProps({
 <template>
     <Flex
         :direction="'column'"
-        :align="'start'"
+        :align="align"
         :justify="justify"
         :gap="gap"
         :full-width="fullWidth"

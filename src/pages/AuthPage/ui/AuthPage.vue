@@ -1,14 +1,13 @@
-import AuthForm from '@/features/AuthForm/ui/AuthForm.vue';
 <template>
-    <div class="auth-page">
+    <Page>
         <AuthForm />
-    </div>
+    </Page>
 </template>
 
 <script setup lang="ts">
 import { AuthForm } from '@/features/AuthForm';
+import { Page } from '@/widgets/Page';
 </script>
 
-<style lang="scss" scoped>
-
+<style lang="css" scoped>
 </style>
