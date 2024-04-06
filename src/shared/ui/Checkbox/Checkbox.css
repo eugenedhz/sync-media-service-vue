@@ -29,7 +29,7 @@ label {
     height: 21px;
     backdrop-filter: var(--blur-clear);
     z-index: -1;
-    transition: backdrop-filter var(--transition-speed-medium);
+    transition: backdrop-filter var(--transition-speed-fast);
 }
 
 label .checkbox:checked + .dot {

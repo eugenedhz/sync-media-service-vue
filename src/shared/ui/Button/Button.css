@@ -2,7 +2,7 @@
 button {
     border-radius: 15px;
     padding: 8px 16px;
-    transition: backdrop-filter var(--transition-speed-medium);
+    transition: backdrop-filter var(--transition-speed-fast);
     box-shadow: var(--shadow);
     border-width: var(--border-md);
     border-style: solid;
@@ -10,14 +10,23 @@ button {
     font: var(--font-m);
     font-weight: 600;
     color: var(--qwarz-light-primary);
-    text-shadow: var(--shadow);
     display: block;
 }
 
 .cleared {
+    transition: var(--transition-speed-fast);
     border: none;
     background: none;
     box-shadow: none;
+    text-shadow: var(--text-shadow);
+}
+
+.cleared:hover:enabled {
+    color: var(--qwarz-light-secondary);
+}
+
+.cleared:active:enabled {
+    color: var(--qwarz-light-tertiary);
 }
 
 .filled {
@@ -34,7 +43,7 @@ button {
 }
 
 /* .filled:focus:enabled, */
-.filled:active:enabled  {
+.filled:active:enabled {
     background-color: var(--qwarz-light-tertiary);
     border-color: var(--qwarz-light-tertiary);
     color: var(--qwarz-dark-primary);
@@ -43,6 +52,7 @@ button {
 .outlined {
     transition: var(--transition-speed-fast);
     border-color: var(--qwarz-light-primary);
+    text-shadow: var(--text-shadow);
     background: transparent;
 }
 
@@ -53,19 +63,19 @@ button {
 
 /* .outlined:focus:enabled, */
 .outlined:active:enabled {
-    border-color: var(--qwarz-light-tertiary);
     color: var(--qwarz-light-tertiary);
 }
 
 .blured {
-    transition: backdrop-filter var(--transition-speed-medium);
+    transition: backdrop-filter var(--transition-speed-fast);
+    text-shadow: var(--text-shadow);
     border-color: var(--qwarz-light-primary);
     backdrop-filter: var(--blur);
     background: transparent;
 }
 
 .blured:hover:enabled {
-    transition: backdrop-filter var(--transition-speed-medium);
+    transition: backdrop-filter var(--transition-speed-fast);
     backdrop-filter: var(--blur-hover);
     border-color: var(--qwarz-light-secondary);
     color: var(--qwarz-light-secondary);
@@ -73,7 +83,7 @@ button {
 
 /* .blured:focus:enabled, */
 .blured:active:enabled {
-    transition: backdrop-filter var(--transition-speed-medium);
+    transition: backdrop-filter var(--transition-speed-fast);
     backdrop-filter: var(--blur-press);
     border-color: var(--qwarz-light-tertiary);
     color: var(--qwarz-light-tertiary);
@@ -104,6 +114,6 @@ button {
 }
 
 .disabled {
-    opacity: 0.5;
+    opacity: 0.75;
     cursor: not-allowed;
 }
