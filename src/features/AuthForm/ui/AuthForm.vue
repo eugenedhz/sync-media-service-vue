@@ -1,5 +1,33 @@
+<script setup lang="ts">
+import {
+    errorsFields,
+    errorsServer
+} from '../lib/validators/validationHandler';
+import { useAuthFormStore } from '../model/authForm';
+import { useAuthStore } from '../model/authStore';
+import { AuthType } from '../model/types/auth';
+
+import { Input, Row, Column, Button, Typography } from '@/shared/ui';
+
+const props = defineProps({
+    authType: {
+        type: String as () => AuthType,
+        default: 'signup'
+    }
+});
+
+const authStore = useAuthStore();
+const authFormStore = useAuthFormStore();
+
+authFormStore.setAuthType(props.authType);
+const { authContent } = authFormStore;
+
+
+
+
+</script>
 <template>
-    <div class="auth-form">
+    <Column :gap="'32'" full-width class="auth-form">
         <!--Вместо иконки для вида-->
         <Typography
             class="icon"
@@ -15,227 +43,122 @@
             :as="'p'"
             :align="'center'"
             :size="'xl'"
-            >{{ authTypeContent.welcomeMsg }}
+            >{{ authContent.welcomeMsg }}
         </Typography>
-        <form @submit.prevent="authTypeContent.authFunc">
-            <Column :gap="'16'" full-width>
-                <Column v-if="errorsServer.size">
-                    <Typography
-                        v-for="error in errorsServer"
-                        :key="error"
-                        :weight="400"
-                        :as="'p'"
-                        :size="'sm'"
-                    >
-                        {{ error }}
-                    </Typography>
-                </Column>
-                <Row :gap="'16'" full-width :justify="'between'">
+        <form @submit.prevent="authFormStore.submitForm(authStore)">
+            <Column :gap="'32'">
+                <Column :gap="'16'" full-width>
+                    <template v-if="errorsServer.size">
+                        <Column>
+                            <template
+                                v-for="error in errorsServer"
+                                :key="error"
+                            >
+                                <Typography
+                                    :weight="400"
+                                    :as="'p'"
+                                    :size="'sm'"
+                                >
+                                    {{ error }}
+                                </Typography>
+                            </template>
+                        </Column>
+                    </template>
+                    <Row :gap="'16'" full-width :justify="'between'">
+                        <Input
+                            v-model="authFormStore.username"
+                            :placeholder="'Login'"
+                            full-width
+                            @input="
+                                authFormStore.setUsername($event.target.value)
+                            "
+                            @click="authFormStore.serverErrorsClear('username')"
+                        />
+                        <template v-if="authFormStore.authType === 'signup'"
+                            ><Input
+                                v-model="authFormStore.displayName"
+                                :placeholder="'Name'"
+                                full-width
+                                @input="
+                                    authFormStore.setDisplayName(
+                                        $event.target.value
+                                    )
+                                "
+                        /></template>
+                    </Row>
+                    <template v-if="authFormStore.authType === 'signup'"
+                        ><Input
+                            v-model="authFormStore.email"
+                            :placeholder="'example@ilow.me'"
+                            :type="'email'"
+                            full-width
+                            @click="authFormStore.serverErrorsClear('email')"
+                            @input="
+                                authFormStore.setEmail($event.target.value)
+                            "
+                    /></template>
                     <Input
-                        v-model="username"
-                        :placeholder="'Login'"
+                        v-model="authFormStore.password"
+                        :placeholder="'Password'"
+                        :type="authFormStore.typeInputPassword"
                         full-width
-                        @input="validationAuthFields('username', username)"
-                        @click="validationAuthErrorClear('username')"
+                        icon-shown
+                        @icon-click="authFormStore.togglePasswordVisibility"
+                        @click="authFormStore.serverErrorsClear('password')"
+                        @input="authFormStore.setPassword($event.target.value)"
                     />
-                    <Input
-                        v-if="authTypeContent.authType === 'signup'"
-                        v-model="displayName"
-                        :placeholder="'Name'"
-                        full-width
-                        @input="
-                            validationAuthFields('displayName', displayName)
-                        "
-                    />
-                </Row>
-                <Input
-                    v-if="authTypeContent.authType === 'signup'"
-                    v-model="email"
-                    :placeholder="'example@ilow.me'"
-                    :type-input="'email'"
-                    full-width
-                    @click="validationAuthErrorClear('email')"
-                />
-                <Input
-                    v-model="password"
-                    :placeholder="'Password'"
-                    :type-input="typeInputPassword"
-                    full-width
-                    icon-shown
-                    @icon-click="
-                        () =>
-                            (typeInputPassword =
-                                typeInputPassword === 'password'
-                                    ? 'text'
-                                    : 'password')
-                    "
-                    @input="
-                        validationAuthFields('password', password);
-                        authTypeContent.authType === 'signup'
-                            ? validationAuthFields(
-                                  'repeatPassword',
-                                  password,
-                                  repeatPassword
-                              )
-                            : null;
-                    "
-                    @click="validationAuthErrorClear('password')"
-                />
-                <Input
-                    v-if="authTypeContent.authType === 'signup'"
-                    v-model="repeatPassword"
-                    :placeholder="'Password'"
-                    :type-input="typeInputRepeatPassword"
-                    full-width
-                    icon-shown
-                    @icon-click="
-                        () =>
-                            (typeInputRepeatPassword =
-                                typeInputRepeatPassword === 'password'
-                                    ? 'text'
-                                    : 'password')
-                    "
-                    @input="
-                        validationAuthFields(
-                            'repeatPassword',
-                            password,
-                            repeatPassword
-                        )
-                    "
-                />
-                <Column v-if="errorsFields.size">
-                    <Typography
-                        v-for="error in errorsFields"
-                        :key="error"
-                        :weight="400"
-                        :as="'p'"
-                        :size="'sm'"
-                    >
-                        {{ error }}
-                    </Typography>
+                    <template v-if="authFormStore.authType === 'signup'">
+                        <Input
+                            v-model="authFormStore.repeatPassword"
+                            :placeholder="'Password'"
+                            :type="authFormStore.typeInputRepeatPassword"
+                            full-width
+                            icon-shown
+                            @icon-click="
+                                authFormStore.toggleRepeatPasswordVisibility
+                            "
+                            @input="
+                                authFormStore.setRepeatPassword(
+                                    $event.target.value
+                                )
+                            "
+                        />
+                    </template>
+                    <template v-if="errorsFields.size">
+                        <Column>
+                            <Typography
+                                v-for="error in errorsFields"
+                                :key="error"
+                                :weight="400"
+                                :as="'p'"
+                                :size="'sm'"
+                            >
+                                {{ error }}
+                            </Typography>
+                        </Column>
+                    </template>
                 </Column>
+                <Button
+                    :disabled="!authFormStore.isFormFilled || errorsFields.size != 0"
+                    class="auth-btn"
+                    type="submit"
+                    full-width
+                    >{{ authContent.buttonText }}</Button
+                >
             </Column>
-            <Button
-                :disabled="!authFilled.value"
-                class="auth-btn"
-                type="submit"
-                full-width
-                >{{ authTypeContent.buttonText }}</Button
-            >
         </form>
-
-        <Typography
-            :weight="500"
-            :as="'p'"
-            :align="'center'"
-            :size="'md'"
-            class="auth-link"
-            @click="authTypeForLink"
-            >{{ authTypeContent.linkText }}
-        </Typography>
-    </div>
+        <RouterLink :to="authContent.route" @click="authFormStore.serverErrorsClear('all')"
+            ><Typography
+                :weight="500"
+                :as="'p'"
+                :align="'center'"
+                :size="'md'"
+                class="auth-link"
+                >{{ authContent.linkText }}
+            </Typography></RouterLink
+        >
+    </Column>
 </template>
-<script setup lang="ts">
-import { ref, computed, PropType } from 'vue';
-
-import {
-    validationAuthFields,
-    validationAuth,
-    validationAuthErrorClear,
-    errorsFields,
-    errorsServer
-} from '../lib/validators/validationHandler';
-import { useAuthStore } from '../model/authStore';
-
-import { Input, Row, Column, Button, Typography } from '@/shared/ui';
-
-const authStore = useAuthStore();
-export type AuthType = 'signup' | 'login';
-
-const props = defineProps({
-    authType: {
-        type: String as PropType<AuthType>,
-        default: 'signup'
-    }
-});
-
-const username = ref('');
-const displayName = ref('');
-const email = ref('');
-const password = ref('');
-const repeatPassword = ref('');
-
-const typeInputPassword = ref('password');
-const typeInputRepeatPassword = ref('password');
-
-async function authSignup() {
-    try {
-        await authStore.signup(
-            displayName.value,
-            email.value,
-            password.value,
-            username.value
-        );
-    } catch (error) {
-        validationAuth(error);
-    }
-}
-
-async function authLogin() {
-    try {
-        await authStore.login(password.value, username.value);
-    } catch (error) {
-        validationAuth(error);
-    }
-}
-
-const isFormFilledSignUp = computed(
-    () =>
-        username.value !== '' &&
-        displayName.value !== '' &&
-        email.value !== '' &&
-        password.value !== '' &&
-        repeatPassword.value !== '' &&
-        password.value === repeatPassword.value
-);
-
-const isFormFilledLogin = computed(
-    () => username.value !== '' && password.value !== ''
-);
-
-const signupContent = {
-    welcomeMsg: 'Welcome!',
-    buttonText: 'SIGN UP',
-    linkText: 'Already have an account?',
-    authType: 'signup',
-    authFunc: authSignup
-};
-
-const loginContent = {
-    welcomeMsg: 'Welcome Back!',
-    buttonText: 'SIGN IN',
-    linkText: 'New here?',
-    authType: 'login',
-    authFunc: authLogin
-};
-
-const authTypeContent = ref(
-    props.authType === 'signup' ? signupContent : loginContent
-);
-
-const authFilled = computed(() =>
-    authTypeContent.value.authType === 'signup'
-        ? isFormFilledSignUp
-        : isFormFilledLogin
-);
-
-function authTypeForLink() {
-    authTypeContent.value =
-        authTypeContent.value.authType === 'signup'
-            ? loginContent
-            : signupContent;
-}
-</script>
 <style>
 @import 'AuthForm.css';
 </style>

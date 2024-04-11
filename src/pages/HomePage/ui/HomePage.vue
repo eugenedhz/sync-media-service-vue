@@ -1,3 +1,31 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+
+import { useCheckboxStore } from '../model/checkboxStore';
+import { useCounterStore } from '../model/counterStore';
+
+import Sample from '@/shared/assets/icons/sample.svg?component';
+import {
+    Button,
+    Tag,
+    Dropdown,
+    Input,
+    Switch,
+    Checkbox,
+    Card,
+    Avatar,
+    Row,
+    Column,
+    Typography
+} from '@/shared/ui';
+
+const counter = useCounterStore();
+const checkboxes = useCheckboxStore();
+
+const enabled = ref(false);
+const input = ref('input');
+</script>
+
 <template>
     {{ counter.doubleCount }}
     <hr />
@@ -79,35 +107,6 @@
     <Avatar :src="'https://w.wallhaven.cc/full/95/wallhaven-95vk3w.png'" />
     <Typography :weight="600" :as="'p'" :align="'center'" :size="'xl'" uppercase>dsad</Typography>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-
-import { useCheckboxStore } from '../model/checkboxStore';
-import { useCounterStore } from '../model/counterStore';
-
-import Sample from '@/shared/assets/icons/sample.svg?component';
-import {
-    Button,
-    Tag,
-    Dropdown,
-    Input,
-    Switch,
-    Checkbox,
-    Card,
-    Avatar,
-    Row,
-    Column,
-    Typography
-} from '@/shared/ui';
-
-const counter = useCounterStore();
-const checkboxes = useCheckboxStore();
-
-const enabled = ref(false);
-const input = ref('input');
-
-</script>
 
 <style>
 @import './HomePage';

@@ -1,21 +1,11 @@
 .auth-form {
-    width: 704px;
-    height: 700px;
-    padding: 50px 32px;
-    margin: auto;
+    max-width: 704px;
 }
-.welcome-msg {
-    margin-top: 25px;
-}
+
 form {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    margin: 50px 0px 25px;
+    width: 100%;
 }
-.auth-btn {
-    margin-top: 50px;
-}
+
 .auth-link:hover {
     text-decoration: underline;
     cursor: default;

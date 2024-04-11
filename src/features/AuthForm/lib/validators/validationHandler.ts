@@ -77,8 +77,8 @@ export function validationAuthFields(
     }
 }
 
-export function validationAuth(error: any) {
-    switch (error.response.data.message) {
+export function validationAuth(error: string) {
+    switch (error) {
     case 'USERNAME_ALREADY_EXISTS':
         errorsServer.value.add(authValidationMessages.USERNAME_ALREADY_EXISTS);
         break;
@@ -110,6 +110,13 @@ export function validationAuthErrorClear(field: string) {
         errorsServer.value.delete(authValidationMessages.EMAIL_ALREADY_EXISTS);
         break;
     case 'password':
+        errorsServer.value.delete(authValidationMessages.INCORRECT_PASSWORD);
+        break;
+    case 'all':
+        errorsServer.value.delete(authValidationMessages.USERNAME_ALREADY_EXISTS);
+        errorsServer.value.delete(authValidationMessages.USERNAME_NOT_FOUND);
+        errorsServer.value.delete(authValidationMessages.USER_IS_BANNED);
+        errorsServer.value.delete(authValidationMessages.EMAIL_ALREADY_EXISTS);
         errorsServer.value.delete(authValidationMessages.INCORRECT_PASSWORD);
         break;
     default:

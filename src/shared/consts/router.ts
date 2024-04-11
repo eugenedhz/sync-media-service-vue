@@ -1,9 +1,11 @@
 export const Routes = {
     HOME: 'home',
-    AUTH: 'auth'
+    LOGIN: 'login',
+    SIGNUP: 'signup',
 } as const;
 
 export type Route = ValueOf<typeof Routes>;
 
 export const getRouteHome = () => '/';
-export const getRouteAuth = () => '/auth';
+export const getRouteLogIn = () => '/login';
+export const getRouteSignUp = () => '/signup';

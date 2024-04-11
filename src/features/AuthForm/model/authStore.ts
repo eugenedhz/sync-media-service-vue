@@ -1,58 +1,65 @@
-import { defineStore } from 'pinia';
+import { _GettersTree, defineStore } from 'pinia';
 
-import { User } from '@/entities/User';
-import { api } from '@/shared/api';
+import { useLogInStore } from '../api/loginRequest';
+import { useSignUpStore } from '../api/signupRequest';
+
+import { LogInRequestArgs } from './types/login';
+import { SignUpRequestArgs } from './types/signup';
+
+import { useUserStore } from '@/entities/User';
 
 export const authNamespace = 'auth';
 
 export interface AuthSchema {
-    user: User | null;
+    error?: string;
 }
 
-export interface AuthGetterSchema {
-    isLoggedIn: (state: AuthSchema) => boolean;
+export interface AuthGetterSchema extends _GettersTree<AuthSchema> {
+    
 }
-
 export interface AuthActionSchema {
-    login: (password: string, username: string) => Promise<void>;
-    signup: (displayName:string, email:string, password: string, username: string) => Promise<void>;
+    login: (params: LogInRequestArgs) => Promise<void>;
+    signup: (params: SignUpRequestArgs) => Promise<void>;
+    clear: () => void;
 }
 
-export const useAuthStore = defineStore(authNamespace, {
+export const useAuthStore = defineStore<string, AuthSchema, AuthGetterSchema, AuthActionSchema>(authNamespace, {
     state: (): AuthSchema => ({
-        user: null
+        error: undefined
     }),
     actions: {
-        async login(password: string, username: string) {
-            try {
-                const response = await api.post(
-                    '/auth/login',
-                    { password, username },
-                    { withCredentials: true }
-                );
-                const userData = response.data as User;
-                this.user = userData;
-                localStorage.setItem('userData', JSON.stringify(userData));
-            } catch (error) {
-                console.error('Login failed: ', error);
-                throw error;
+        async login(authData: LogInRequestArgs) {
+            const loginStore = useLogInStore();
+            await loginStore.login(authData);
+            if (!loginStore.error) {
+                const userData = loginStore.data;
+                if(userData) {
+                    const userStore = useUserStore();
+                    userStore.setUser(userData);
+                }
+                this.clear();
+            }
+            else {
+                this.error = loginStore.error;
             }
         },
-        async signup(displayName:string, email:string, password: string, username: string) {
-            try {
-                const response = await api.post(
-                    '/auth/signup',
-                    {displayName, email, password, username},
-                    { withCredentials: true }
-                );
-                const userData = response.data as User;
-                this.user = userData;
-                localStorage.setItem('userData', JSON.stringify(userData));
+        async signup(authData: SignUpRequestArgs) {
+            const signupStore = useSignUpStore();
+            await signupStore.signup(authData);
+            if (!signupStore.error) {
+                const userData = signupStore.data;
+                if(userData) {
+                    const userStore = useUserStore();
+                    userStore.setUser(userData);
+                }
+                this.clear();
             }
-            catch(error) {
-                console.error('Signup failed: ', error);
-                throw error;
+            else {
+                this.error = signupStore.error;
             }
-        }
+        },
+        clear() {
+            this.error = undefined;
+        },
     }
 });

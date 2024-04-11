@@ -22,7 +22,7 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    typeInput: {
+    type: {
         type: String,
         default: 'text'
     }
@@ -40,7 +40,7 @@ const classes = computed(() => ({
             :class="classes"
             :value="modelValue"
             :placeholder="placeholder"
-            :type="typeInput"
+            :type="type"
             @input="
                 $emit(
                     'update:modelValue',
