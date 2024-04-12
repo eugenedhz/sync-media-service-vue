@@ -8,11 +8,24 @@ span {
     border: var(--border-sm) solid rgb(var(--qwarz-light-tertiary-value) / 30%);
     color: var(--qwarz-light-primary);
     text-align: center;
-    text-shadow: var(--shadow);
+    text-shadow: var(--text-shadow);
     display: inline-block;
     cursor: default;
+    transition: var(--transition-speed-fast);
 }
 
 .full-width {
     width: 100%;
+}
+
+.tag:hover {
+    background-color: rgba(var(--qwarz-dark-secondary-value) 0.3);
+    color: var(--qwarz-light-secondary);
+    backdrop-filter: var(--blur-hover);
+}
+
+.tag:active {
+    background-color: rgba(var(--qwarz-dark-tertiary-value) 0.3);
+    color: var(--qwarz-light-tertiary);
+    backdrop-filter: var(--blur-press);
 }
