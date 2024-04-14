@@ -9,7 +9,3 @@ export interface User {
     registrationDate: number;
     username: string;
 }
-
-export interface UserSchema {
-    authData?: User;
-}

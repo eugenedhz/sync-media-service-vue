@@ -1,6 +1,2 @@
-import { User } from './model/types/user';
-import { useUserStore } from './model/userStore';
-
-export type { User };
-
-export {useUserStore};
+export type { User } from './model/types/user';
+export { useUserStore } from './model/userStore';

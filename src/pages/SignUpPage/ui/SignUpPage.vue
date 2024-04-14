@@ -4,7 +4,7 @@ import { Page } from '@/widgets/Page';
 </script>
 <template>
     <Page>
-        <AuthForm :auth-type="'signup'"/>
+        <AuthForm :type="'signup'" />
     </Page>
 </template>
 <style></style>

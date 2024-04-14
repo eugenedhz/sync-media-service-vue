@@ -1,62 +1,59 @@
 import { isAxiosError } from 'axios';
 import { _GettersTree, defineStore } from 'pinia';
 
-import { ApiError } from '../model/types/apiError';
-import { LogInRequestArgs } from '../model/types/login';
+import { ApiError } from '../../../shared/api/types/apiError';
+
+import { SignUpRequestArgs } from './types/signup';
 
 import { User } from '@/entities/User';
 import { api } from '@/shared/api';
 
+export const signupNamespace = 'signup';
 
-export const loginNamespace = 'login';
-
-export interface LogInSchema {
+export interface SignUpSchema {
     data?: User,
     error?: string,
     isLoading: boolean
 }
 
-export interface LogInGetterSchema extends _GettersTree<LogInSchema>{
+export interface _SignUpGetterSchema extends _GettersTree<SignUpSchema>{
 
 }
 
-export interface LogInActionsSchema {
-    login: (params: LogInRequestArgs) => Promise<void>;
-    clear: () => void
+export interface SignUpActionsSchema {
+    signup: (params: SignUpRequestArgs) => Promise<void>;
 }
 
-export const useLogInStore = defineStore<string, LogInSchema, LogInGetterSchema, LogInActionsSchema>(loginNamespace, {
-    state: (): LogInSchema => ({
+export const useSignUpStore = defineStore<string, SignUpSchema, _SignUpGetterSchema, SignUpActionsSchema>(signupNamespace, {
+    state: (): SignUpSchema => ({
         data: undefined,
         error: undefined,
         isLoading: false
     }),
     actions: {
-        async login(authData: LogInRequestArgs) {
+        async signup(authData: SignUpRequestArgs) {
             this.isLoading = true;
             try {
                 const response = await api.post<User>(
-                    '/auth/login',
+                    '/auth/signup',
                     authData,
                     { withCredentials: true }
                 );
                 this.data = response.data;
+                this.error = undefined;
             }
             catch(error) {
                 if (isAxiosError<ApiError>(error)) {
                     this.error = error.response?.data.message;
+                    this.data = undefined;
                 } else {
-                    this.error = 'Failed to login';
+                    this.error = 'Failed to signup';
+                    this.data = undefined;
                 }
             }
             finally {
                 this.isLoading = false;
             }
-        },
-        clear() {
-            this.data = undefined;
-            this.error = undefined;
-            this.isLoading = false;
         },
     }
 });

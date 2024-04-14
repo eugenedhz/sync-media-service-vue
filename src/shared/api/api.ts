@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { __BASE_URL__ } from '../config/environment';
+import { LOGGED_IN_LOCAL_STORAGE_KEY } from '../consts/localStorage';
 
 export const api = axios.create({
     baseURL: __BASE_URL__,
@@ -19,7 +20,9 @@ api.interceptors.response.use(
         const isSameRequest = originalRequest;
         const isRetry = error.config._isRetry;
 
-        if (isStatusUnauthorized && isSameRequest && !isRetry) {
+        const loggedIn = localStorage.getItem(LOGGED_IN_LOCAL_STORAGE_KEY); // очань сомнительно, надеюсь не critical
+
+        if (isStatusUnauthorized && isSameRequest && !isRetry && loggedIn) {
             originalRequest._isRetry = true;
             try {
                 await api.post(
