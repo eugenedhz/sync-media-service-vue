@@ -1,7 +1,7 @@
 import { _GettersTree, defineStore } from 'pinia';
 
-import { useLogInStore } from '../api/login';
-import { useSignUpStore } from '../api/signup';
+import { useLogInApi } from '../api/login';
+import { useSignUpApi } from '../api/signup';
 import {
     validationAuth,
     validationAuthErrorClear
@@ -75,15 +75,15 @@ export const useAuthFormStore = defineStore<string, AuthFormSchema, _AuthFormGet
         },
         async submitForm(authType: string) {
             if (authType === 'signup') {
-                const signupStore = useSignUpStore();
-                await signupStore.signup({
+                const signupApi = useSignUpApi();
+                await signupApi.initiate({
                     displayName: this.displayName,
                     email: this.email,
                     password: this.password,
                     username: this.username
                 });
-                if (!signupStore.error) {
-                    const userData = signupStore.data;
+                if (!signupApi.error) {
+                    const userData = signupApi.data;
                     if(userData) {
                         const userStore = useUserStore();
                         userStore.setUser(userData);
@@ -91,17 +91,17 @@ export const useAuthFormStore = defineStore<string, AuthFormSchema, _AuthFormGet
                     this.clearForm();
                 }
                 else {
-                    validationAuth(signupStore.error);
+                    validationAuth(signupApi.error);
                 }
             } 
             else {
-                const loginStore = useLogInStore();
-                await loginStore.login({
+                const loginApi = useLogInApi();
+                await loginApi.initiate({
                     password: this.password,
                     username: this.username
                 });
-                if (!loginStore.error) {
-                    const userData = loginStore.data;
+                if (!loginApi.error) {
+                    const userData = loginApi.data;
                     if(userData) {
                         const userStore = useUserStore();
                         userStore.setUser(userData);
@@ -109,7 +109,7 @@ export const useAuthFormStore = defineStore<string, AuthFormSchema, _AuthFormGet
                     this.clearForm();
                 }
                 else {
-                    validationAuth(loginStore.error);
+                    validationAuth(loginApi.error);
                 }
             }
         }

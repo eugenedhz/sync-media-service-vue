@@ -18,7 +18,7 @@ export interface ApiActionsSchema<Entity, Body> {
     _setData(data?: Entity): void;
     _setError(error?: string): void; 
     _setIsLoading(isLoading: boolean): void;
-    initiate(body: Body extends Record<string, unknown> ? Body : void): Promise<Entity | undefined>; 
+    initiate(body: Body extends Record<string, any> ? Body : void): Promise<Entity | undefined>; 
 }
 
 export const buildApi = <Entity, Body = void>(
@@ -48,7 +48,7 @@ export const buildApi = <Entity, Body = void>(
                     isLoading
                 });
             },
-            async initiate<Body>(body: Body extends Record<string, unknown> ? Body : undefined): Promise<Entity | undefined> {
+            async initiate(body: Body extends Record<string, any> ? Body : undefined): Promise<Entity | undefined> {
                 this._setIsLoading(true);
 
                 try {

@@ -1,16 +1,15 @@
 import { _GettersTree, defineStore } from 'pinia';
 
-import { useCheckAuthStore } from '../api/checkAuth';
-import { useLogOutStore } from '../api/logout';
+import { useCheckAuthApi } from '../api/checkAuth';
+import { useLogOutApi } from '../api/logout';
 
 import { User } from './types/user';
 
-import { USER_LOCAL_STORAGE_KEY, LOGGED_IN_LOCAL_STORAGE_KEY } from '@/shared/consts/localStorage';
+import { USER_LOCAL_STORAGE_KEY } from '@/shared/consts/localStorage';
 
 export const userNamespace = 'user';
 
 export interface UserSchema {
-    loggedIn: boolean,
     authData?: User;
 }
 
@@ -26,41 +25,32 @@ export interface UserActionsSchema {
 
 export const useUserStore = defineStore<string, UserSchema, _UserGetterSchema, UserActionsSchema>(userNamespace, {
     state: (): UserSchema => ({
-        loggedIn: false,
         authData: undefined
     }),
     actions: {
-        setUser(authData: User){
-            this.loggedIn = true;
-            this.authData = authData;
-            localStorage.setItem(LOGGED_IN_LOCAL_STORAGE_KEY, JSON.stringify(this.loggedIn));
-            localStorage.setItem(USER_LOCAL_STORAGE_KEY, JSON.stringify(authData));
+        setUser(user: User){
+            this.authData = user;
+            localStorage.setItem(USER_LOCAL_STORAGE_KEY, JSON.stringify(user));
         },
         async logout(){
-            const logoutStore = useLogOutStore();
-            await logoutStore.logout();
-            if (!logoutStore.error){
-                this.loggedIn = false;
+            const logoutApi = useLogOutApi();
+            await logoutApi.initiate();
+            if (!logoutApi.error){
                 this.authData = undefined;
-                localStorage.removeItem(LOGGED_IN_LOCAL_STORAGE_KEY);
                 localStorage.removeItem(USER_LOCAL_STORAGE_KEY);
             }
         }, 
         async checkAuth() {
-            const checkAuthStore = useCheckAuthStore();
-            await checkAuthStore.checkAuth();
-            if (!checkAuthStore.error){
-                const loggedIn = localStorage.getItem(LOGGED_IN_LOCAL_STORAGE_KEY);
+            const checkAuthApi = useCheckAuthApi();
+            await checkAuthApi.initiate();
+            if (!checkAuthApi.error){
                 const authData = localStorage.getItem(USER_LOCAL_STORAGE_KEY);
-                if (authData && loggedIn) {
-                    this.loggedIn = JSON.parse(loggedIn);
+                if (authData) {
                     this.authData = JSON.parse(authData);
                 }
             }
             else {
-                this.loggedIn = false;
                 this.authData = undefined;
-                localStorage.removeItem(LOGGED_IN_LOCAL_STORAGE_KEY);
                 localStorage.removeItem(USER_LOCAL_STORAGE_KEY);
             }
         } 

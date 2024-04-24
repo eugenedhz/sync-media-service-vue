@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, PropType, onMounted } from 'vue';
 
-import { authContentAssigment } from '../lib/authContent/authContent';
-import { AuthType } from '../lib/authContent/types/authContent';
 import { errorsServer } from '../lib/validators/validationHandler';
 import { useAuthFormStore } from '../model/authFormStore';
+import { loginContent, signupContent } from '../model/constans/authContent';
+import { AuthType } from '../model/types/authType';
 
 import { Input, Row, Column, Button, Typography } from '@/shared/ui';
 
@@ -20,7 +20,7 @@ const authFormStore = useAuthFormStore();
 const authType = props.type;
 const typeInputPassword = ref('password');
 const typeInputRepeatPassword = ref('password');
-const authContent = authContentAssigment(authType);
+const authContent = authType === 'signup' ? signupContent : loginContent;
 
 onMounted(() => {
     authFormStore.setIsFormFilled(authType);
