@@ -1,14 +1,8 @@
 import { _GettersTree, defineStore } from 'pinia';
 
-import { useLogInApi } from '../api/login';
-import { useSignUpApi } from '../api/signup';
-import {
-    validationAuth,
-    validationAuthErrorClear
-} from '../lib/validators/validationHandler';
+import { useLoginApi, useSignupApi } from '../api/requests';
 
 import { useUserStore } from '@/entities/User';
-
 
 export const authFormNamespace = 'authForm';
 
@@ -18,7 +12,7 @@ export interface AuthFormSchema {
     email: string;
     password: string;
     repeatPassword: string;
-    isFormFilled: boolean;
+    error?: string;
 }
 
 export interface _AuthFormGetterSchema extends _GettersTree<AuthFormSchema> {
@@ -26,10 +20,9 @@ export interface _AuthFormGetterSchema extends _GettersTree<AuthFormSchema> {
 }
 
 export interface AuthFormActionsSchema {
-    setIsFormFilled: (params: string) => void;
-    clearForm: () => void;
-    serverErrorsClear: (params: string) => void;
-    submitForm: (params: string) => Promise<void>;
+    resetForm: () => void;
+    signup: () => Promise<void>;
+    login: () => Promise<void>;
 }
 
 export const useAuthFormStore = defineStore<string, AuthFormSchema, _AuthFormGetterSchema, AuthFormActionsSchema>(authFormNamespace, {
@@ -39,79 +32,47 @@ export const useAuthFormStore = defineStore<string, AuthFormSchema, _AuthFormGet
         email: '',
         password: '',
         repeatPassword: '',
-        isFormFilled: false
+        error: undefined
     }),
     actions: {
-        setIsFormFilled(authType: string) {
-            if (authType === 'signup') {
-                if (
-                    this.username !== '' &&
-                    this.displayName !== '' &&
-                    this.email !== '' &&
-                    this.password !== '' &&
-                    this.repeatPassword !== '' &&
-                    this.password === this.repeatPassword
-                ) {
-                    this.isFormFilled = true;
-                } else {
-                    this.isFormFilled = false;
-                }
-            } else if (this.username !== '' && this.password !== '') {
-                this.isFormFilled = true;
-            } else {
-                this.isFormFilled = false;
-            }
-        },
-        clearForm() {
+        resetForm() {
             this.username = '';
             this.displayName = '';
             this.email = '';
             this.password = '';
             this.repeatPassword = '';
-            this.isFormFilled = false;
         },
-        serverErrorsClear(field: string) {
-            validationAuthErrorClear(field);
-        },
-        async submitForm(authType: string) {
-            if (authType === 'signup') {
-                const signupApi = useSignUpApi();
-                await signupApi.initiate({
-                    displayName: this.displayName,
-                    email: this.email,
-                    password: this.password,
-                    username: this.username
-                });
-                if (!signupApi.error) {
-                    const userData = signupApi.data;
-                    if(userData) {
-                        const userStore = useUserStore();
-                        userStore.setUser(userData);
-                    }
-                    this.clearForm();
-                }
-                else {
-                    validationAuth(signupApi.error);
-                }
-            } 
-            else {
-                const loginApi = useLogInApi();
-                await loginApi.initiate({
-                    password: this.password,
-                    username: this.username
-                });
-                if (!loginApi.error) {
-                    const userData = loginApi.data;
-                    if(userData) {
-                        const userStore = useUserStore();
-                        userStore.setUser(userData);
-                    }
-                    this.clearForm();
-                }
-                else {
-                    validationAuth(loginApi.error);
-                }
+        async signup() {
+            const signupApi = useSignupApi();
+            const response = await signupApi.initiate({
+                displayName: this.displayName,
+                email: this.email,
+                password: this.password,
+                username: this.username
+            });
+            if (response) {
+                const userStore = useUserStore();
+                userStore.setUser(response);
+                this.resetForm();
+                this.error = undefined;
+            } else {
+                this.error = signupApi.error; // пока не юзаю authValidationMessages потому что он орет по разным причинам надо сделать кучу проверок, я лучше подожду хук по валидациям, а потом уже буду накидывать
             }
-        }
+        },
+        async login() {
+            const loginApi = useLoginApi();
+            const response = await loginApi.initiate({
+                password: this.password,
+                username: this.username
+            });
+            if (response) {
+                const userStore = useUserStore();
+                userStore.setUser(response);
+                this.resetForm();
+                this.error = undefined;
+            } else {
+                this.error = loginApi.error;
+            }
+        },
     },
 });

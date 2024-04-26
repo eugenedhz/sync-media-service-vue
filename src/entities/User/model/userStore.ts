@@ -1,7 +1,6 @@
 import { _GettersTree, defineStore } from 'pinia';
 
-import { useCheckAuthApi } from '../api/checkAuth';
-import { useLogOutApi } from '../api/logout';
+import { useCheckAuthApi, useLogoutApi } from '../api/requests';
 
 import { User } from './types/user';
 
@@ -33,23 +32,19 @@ export const useUserStore = defineStore<string, UserSchema, _UserGetterSchema, U
             localStorage.setItem(USER_LOCAL_STORAGE_KEY, JSON.stringify(user));
         },
         async logout(){
-            const logoutApi = useLogOutApi();
-            await logoutApi.initiate();
-            if (!logoutApi.error){
+            const logoutApi = useLogoutApi();
+            const response = await logoutApi.initiate();
+            if (response){
                 this.authData = undefined;
                 localStorage.removeItem(USER_LOCAL_STORAGE_KEY);
             }
         }, 
         async checkAuth() {
             const checkAuthApi = useCheckAuthApi();
-            await checkAuthApi.initiate();
-            if (!checkAuthApi.error){
-                const authData = localStorage.getItem(USER_LOCAL_STORAGE_KEY);
-                if (authData) {
-                    this.authData = JSON.parse(authData);
-                }
-            }
-            else {
+            const response = await checkAuthApi.initiate();
+            if (response){
+                this.authData = response;
+            } else {
                 this.authData = undefined;
                 localStorage.removeItem(USER_LOCAL_STORAGE_KEY);
             }
