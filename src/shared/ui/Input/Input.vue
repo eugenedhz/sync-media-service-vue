@@ -1,7 +1,13 @@
 <script lang="ts" setup>
 import { computed, defineProps } from 'vue';
 
-defineEmits(['update:modelValue', 'iconClick']);
+defineEmits([
+    'update:modelValue', 
+    'iconClick', 
+    'blur',
+    'focus',
+    'change'
+]);
 const props = defineProps({
     disabled: {
         type: Boolean,
@@ -41,9 +47,15 @@ const classes = computed(() => ({
             :value="modelValue"
             :placeholder="placeholder"
             :type="type"
+            @blur="$emit('blur')"
+            @focus="$emit('focus')"
             @input="
                 $emit(
                     'update:modelValue',
+                    ($event.target as HTMLInputElement).value
+                );
+                $emit(
+                    'change',
                     ($event.target as HTMLInputElement).value
                 )
             "

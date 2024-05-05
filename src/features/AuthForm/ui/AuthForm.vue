@@ -56,14 +56,17 @@ const submitForm = () => {
                         </template>
                     </Row>
                     <template v-if="authType === 'signup'">
-                        <Input v-model="authFormStore.email" :placeholder="'example@ilow.me'" :type="'email'"
+                        <Input
+v-model="authFormStore.email" :placeholder="'example@ilow.me'" :type="'email'"
                             full-width />
                     </template>
-                    <Input v-model="authFormStore.password" :placeholder="'Password'"
+                    <Input
+v-model="authFormStore.password" :placeholder="'Password'"
                         :type="isPasswordVisible ? 'text' : 'password'" full-width icon-shown
                         @icon-click="togglePasswordsVisibility('password')" />
                     <template v-if="authType === 'signup'">
-                        <Input v-model="authFormStore.repeatPassword" :placeholder="'Password'"
+                        <Input
+v-model="authFormStore.repeatPassword" :placeholder="'Password'"
                             :type="isRepeatPasswordVisible ? 'text' : 'password'" full-width icon-shown
                             @icon-click="togglePasswordsVisibility('repeatPassword')" />
                     </template>

@@ -41,6 +41,7 @@ module.exports = {
         'no-empty-function': 'off',
         'no-param-reassign': 'off',
         'no-undef': 'off',
+        'no-restricted-syntax': 'off',
         'linebreak-style': 'off',
         'max-len': [
             'error',
