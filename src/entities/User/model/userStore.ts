@@ -44,10 +44,10 @@ export const useUserStore = defineStore<string, UserSchema, _UserGetterSchema, U
             const response = await checkAuthApi.initiate();
             if (response){
                 this.authData = response;
-            } else {
-                this.authData = undefined;
-                localStorage.removeItem(USER_LOCAL_STORAGE_KEY);
+                return;
             }
+            this.authData = undefined;
+            localStorage.removeItem(USER_LOCAL_STORAGE_KEY);
         } 
     },
 });

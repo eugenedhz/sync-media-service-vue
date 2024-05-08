@@ -1,8 +1,10 @@
 import { _GettersTree, defineStore } from 'pinia';
 
 import { useLoginApi, useSignupApi } from '../api/requests';
+import { validationRequests } from '../lib/validators/validationHandler';
 
 import { useUserStore } from '@/entities/User';
+
 
 export const authFormNamespace = 'authForm';
 
@@ -20,7 +22,6 @@ export interface _AuthFormGetterSchema extends _GettersTree<AuthFormSchema> {
 }
 
 export interface AuthFormActionsSchema {
-    resetForm: () => void;
     signup: () => Promise<void>;
     login: () => Promise<void>;
 }
@@ -35,14 +36,8 @@ export const useAuthFormStore = defineStore<string, AuthFormSchema, _AuthFormGet
         error: undefined
     }),
     actions: {
-        resetForm() {
-            this.username = '';
-            this.displayName = '';
-            this.email = '';
-            this.password = '';
-            this.repeatPassword = '';
-        },
         async signup() {
+            this.error = undefined;
             const signupApi = useSignupApi();
             const response = await signupApi.initiate({
                 displayName: this.displayName,
@@ -53,13 +48,12 @@ export const useAuthFormStore = defineStore<string, AuthFormSchema, _AuthFormGet
             if (response) {
                 const userStore = useUserStore();
                 userStore.setUser(response);
-                this.resetForm();
-                this.error = undefined;
-            } else {
-                this.error = signupApi.error; // пока не юзаю authValidationMessages потому что он орет по разным причинам надо сделать кучу проверок, я лучше подожду хук по валидациям, а потом уже буду накидывать
+                return;
             }
+            this.error = validationRequests(signupApi.error);
         },
         async login() {
+            this.error = undefined;
             const loginApi = useLoginApi();
             const response = await loginApi.initiate({
                 password: this.password,
@@ -68,11 +62,9 @@ export const useAuthFormStore = defineStore<string, AuthFormSchema, _AuthFormGet
             if (response) {
                 const userStore = useUserStore();
                 userStore.setUser(response);
-                this.resetForm();
-                this.error = undefined;
-            } else {
-                this.error = loginApi.error;
+                return;
             }
+            this.error = validationRequests(loginApi.error);
         },
     },
 });

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, PropType, computed } from 'vue';
 
+import {validation} from '../lib/validators/validationHandler';
 import { useAuthFormStore } from '../model/authFormStore';
 import { loginContent, signupContent } from '../model/constans/authContent';
 import { AuthType } from '../model/types/authType';
 
+import { useFormValidation } from '@/shared/lib/hooks/useFormValidation';
 import { Input, Row, Column, Button, Typography } from '@/shared/ui';
 
 const props = defineProps({
@@ -14,27 +16,66 @@ const props = defineProps({
     }
 });
 
+
 const authFormStore = useAuthFormStore();
 
-const authType = computed(() => props.type);
+const authType = props.type;
 const isPasswordVisible = ref(false);
 const isRepeatPasswordVisible = ref(false);
-const authContent = computed(() => authType.value === 'signup' ? signupContent : loginContent);
+const authContent = computed(() =>
+    authType === 'signup' ? signupContent : loginContent
+);
+
+const signupValidation = computed(() => ({
+    username: {
+        value: authFormStore.username,
+        validations: [validation.validationUsernameLenght, validation.validationUsernameRegexp]
+    },
+    displayName: {
+        value: authFormStore.displayName,
+        validations: [validation.validationDisplayName]
+    },
+    password: {
+        value: authFormStore.password,
+        validations: [validation.validationPasswordLenght, validation.validationPasswordRegexp]
+    },
+    repeatPassword: {
+        value: {repeatPassword: authFormStore.repeatPassword, password: authFormStore.password},
+        validations: [validation.validationRepeatPassword]
+    }
+}));
+
+const loginValidation = computed(() => ({
+    username: {
+        value: authFormStore.username,
+        validations: [validation.validationUsernameLenght, validation.validationUsernameRegexp]
+    },
+    password: {
+        value: authFormStore.password,
+        validations: [validation.validationPasswordLenght, validation.validationPasswordRegexp]
+    },
+}));
+
+const authValidation = computed(() =>
+    authType === 'signup' ? signupValidation : loginValidation
+);
+
+const { errors, onBlur, onFocus, onChange, isFormDirty, isFormValid } = useFormValidation(computed(() => (authValidation.value.value)));
 
 const togglePasswordsVisibility = (passwordField: string) => {
-    if (passwordField === 'password') {
+    if (passwordField === 'password') { 
         isPasswordVisible.value = !isPasswordVisible.value;
-    } else {
-        isRepeatPasswordVisible.value = !isRepeatPasswordVisible.value;
+        return;
     }
+    isRepeatPasswordVisible.value = !isRepeatPasswordVisible.value;
 };
 
 const submitForm = () => {
-    if (authType.value === 'signup') {
+    if (authType === 'signup') {
         authFormStore.signup();
-    } else {
-        authFormStore.login();
+        return;
     }
+    authFormStore.login();
 };
 </script>
 <template>
@@ -50,30 +91,73 @@ const submitForm = () => {
             <Column :gap="'32'">
                 <Column :gap="'16'" full-width>
                     <Row :gap="'16'" full-width :justify="'between'">
-                        <Input v-model="authFormStore.username" :placeholder="'Login'" full-width />
+                        <Input
+                            v-model="authFormStore.username"
+                            :placeholder="'Login'"
+                            full-width
+                            @blur="onBlur('username')"
+                            @focus="onFocus('username')"
+                            @change="onChange('username')"
+                        />
                         <template v-if="authType === 'signup'">
-                            <Input v-model="authFormStore.displayName" :placeholder="'Name'" full-width />
+                            <Input
+                                v-model="authFormStore.displayName"
+                                :placeholder="'Name'"
+                                full-width
+                                @blur="onBlur('displayName')"
+                                @focus="onFocus('displayName')"
+                                @change="onChange('displayName')"
+                            />
                         </template>
                     </Row>
                     <template v-if="authType === 'signup'">
                         <Input
-v-model="authFormStore.email" :placeholder="'example@ilow.me'" :type="'email'"
-                            full-width />
+                            v-model="authFormStore.email"
+                            :placeholder="'example@ilow.me'"
+                            :type="'email'"
+                            full-width
+                        />
                     </template>
                     <Input
-v-model="authFormStore.password" :placeholder="'Password'"
-                        :type="isPasswordVisible ? 'text' : 'password'" full-width icon-shown
-                        @icon-click="togglePasswordsVisibility('password')" />
+                        v-model="authFormStore.password"
+                        :placeholder="'Password'"
+                        :type="isPasswordVisible ? 'text' : 'password'"
+                        full-width
+                        icon-shown
+                        @icon-click="togglePasswordsVisibility('password')"
+                        @blur="onBlur('password')"
+                        @focus="onFocus('password')"
+                        @change="onChange('password')"
+                    />
                     <template v-if="authType === 'signup'">
                         <Input
-v-model="authFormStore.repeatPassword" :placeholder="'Password'"
-                            :type="isRepeatPasswordVisible ? 'text' : 'password'" full-width icon-shown
-                            @icon-click="togglePasswordsVisibility('repeatPassword')" />
+                            v-model="authFormStore.repeatPassword"
+                            :placeholder="'Password'"
+                            :type="
+                                isRepeatPasswordVisible ? 'text' : 'password'
+                            "
+                            full-width
+                            icon-shown
+                            @icon-click="
+                                togglePasswordsVisibility('repeatPassword')
+                            "
+                            @blur="onBlur('repeatPassword')"
+                            @focus="onFocus('repeatPassword')"
+                            @change="onChange('repeatPassword')"
+                        />
                     </template>
+                    <Column>
+                        <template v-for="error in errors" :key="error">
+                            <template v-for="er in error.errors" :key="er">
+                                <Typography :size="'sm'" :align="'start'">{{ er }}</Typography>
+                            </template>
+                        </template>
+                    </Column>
                 </Column>
-                <Button type="submit" full-width>
+                <Button type="submit" full-width :disabled="!isFormValid || !isFormDirty">
                     {{ authContent.buttonText }}
                 </Button>
+                <Typography :size="'sm'" :align="'start'">{{ authFormStore.error }}</Typography>
             </Column>
         </form>
         <RouterLink :to="authContent.route">

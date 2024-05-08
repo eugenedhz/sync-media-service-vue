@@ -28,6 +28,11 @@
     --qwarz-dark-secondary-value: 38 38 38;
     --qwarz-dark-tertiary-value: 3 3 3;
 
+    /* Errors */
+    --qwarz-errors-primary-value: 220 38 38;
+    --qwarz-errors-secondary-value: 215 88 88;
+    --qwarz-errors-tertiary-value: 197 35 35;
+
     /* Light */
     --qwarz-light-primary: rgb(243 243 243);
     --qwarz-light-secondary: rgb(248 252 252);
@@ -37,6 +42,11 @@
     --qwarz-dark-primary: rgb(23 23 23);
     --qwarz-dark-secondary: rgb(38 38 38);
     --qwarz-dark-tertiary: rgb(3 3 3);
+
+    /* Errors */
+    --qwarz-errors-primary-value: rgb(220 38 38);
+    --qwarz-errors-secondary-value: rgb(215 88 88);
+    --qwarz-errors-tertiary-value: rgb(197 35 35);
 
     /* Blurs */
     --blur: blur(10px);
