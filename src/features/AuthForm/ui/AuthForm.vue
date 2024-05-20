@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, PropType, computed } from 'vue';
 
-import {validation} from '../lib/validators/validationHandler';
+import { authValidationMessages } from '../lib/validators/messages';
 import { useAuthFormStore } from '../model/authFormStore';
 import { loginContent, signupContent } from '../model/constans/authContent';
 import { AuthType } from '../model/types/authType';
@@ -16,7 +16,6 @@ const props = defineProps({
     }
 });
 
-
 const authFormStore = useAuthFormStore();
 
 const authType = props.type;
@@ -29,41 +28,118 @@ const authContent = computed(() =>
 const signupValidation = computed(() => ({
     username: {
         value: authFormStore.username,
-        validations: [validation.validationUsernameLenght, validation.validationUsernameRegexp]
+        validations: [
+            (username: string): boolean | string => {
+                if (username.length > 30 || username.length < 5) {
+                    return authValidationMessages.INVALID_LENGTH.USERNAME;
+                }
+                return true;
+            },
+            (username: string): boolean | string => {
+                const regexp = /^[a-zA-Z0-9._-]+$/;
+                if (!regexp.test(username)) {
+                    return authValidationMessages.REGEXP_MISMATCH.USERNAME;
+                }
+                return true;
+            }
+        ]
     },
     displayName: {
         value: authFormStore.displayName,
-        validations: [validation.validationDisplayName]
+        validations: [
+            (displayName: string): boolean | string => {
+                if (displayName.length > 30) {
+                    return authValidationMessages.INVALID_LENGTH.DISPLAY_NAME;
+                }
+                return true;
+            }
+        ]
     },
     password: {
         value: authFormStore.password,
-        validations: [validation.validationPasswordLenght, validation.validationPasswordRegexp]
+        validations: [
+            (password: string): boolean | string => {
+                if (password.length < 8) {
+                    return authValidationMessages.INVALID_LENGTH.PASSWORD;
+                }
+                return true;
+            },
+            (password: string): boolean | string => {
+                const regexp = /^[a-zA-Z0-9.@_-]+$/;
+                if (!regexp.test(password)) {
+                    return authValidationMessages.REGEXP_MISMATCH.PASSWORD;
+                }
+                return true;
+            }
+        ]
     },
     repeatPassword: {
-        value: {repeatPassword: authFormStore.repeatPassword, password: authFormStore.password},
-        validations: [validation.validationRepeatPassword]
+        value: {
+            repeatPassword: authFormStore.repeatPassword,
+            password: authFormStore.password
+        },
+        validations: [
+            (params: {
+                repeatPassword: string;
+                password: string;
+            }): boolean | string => {
+                if (params.repeatPassword !== params.password) {
+                    return authValidationMessages.PASSWORDS_NOT_MATCH;
+                }
+                return true;
+            }
+        ]
     }
 }));
 
 const loginValidation = computed(() => ({
     username: {
         value: authFormStore.username,
-        validations: [validation.validationUsernameLenght, validation.validationUsernameRegexp]
+        validations: [
+            (username: string): boolean | string => {
+                if (username.length > 30 || username.length < 5) {
+                    return authValidationMessages.INVALID_LENGTH.USERNAME;
+                }
+                return true;
+            },
+            (username: string): boolean | string => {
+                const regexp = /^[a-zA-Z0-9._-]+$/;
+                if (!regexp.test(username)) {
+                    return authValidationMessages.REGEXP_MISMATCH.USERNAME;
+                }
+                return true;
+            }
+        ]
     },
     password: {
         value: authFormStore.password,
-        validations: [validation.validationPasswordLenght, validation.validationPasswordRegexp]
-    },
+        validations: [
+            (password: string): boolean | string => {
+                if (password.length < 8) {
+                    return authValidationMessages.INVALID_LENGTH.PASSWORD;
+                }
+                return true;
+            },
+            (password: string): boolean | string => {
+                const regexp = /^[a-zA-Z0-9.@_-]+$/;
+                if (!regexp.test(password)) {
+                    return authValidationMessages.REGEXP_MISMATCH.PASSWORD;
+                }
+                return true;
+            }
+        ]
+    }
 }));
 
 const authValidation = computed(() =>
     authType === 'signup' ? signupValidation : loginValidation
 );
 
-const { errors, onBlur, onFocus, onChange, isFormDirty, isFormValid } = useFormValidation(computed(() => (authValidation.value.value)));
+const { errors, onBlur, onFocus, onChange, isFormDirty, isFormValid } =
+    useFormValidation(computed(() => authValidation.value.value));
 
 const togglePasswordsVisibility = (passwordField: string) => {
-    if (passwordField === 'password') { 
+    if (passwordField === 'password') {
         isPasswordVisible.value = !isPasswordVisible.value;
         return;
     }
@@ -149,18 +225,26 @@ const submitForm = () => {
                     <Column>
                         <template v-for="error in errors" :key="error">
                             <template v-for="er in error.errors" :key="er">
-                                <Typography :size="'sm'" :align="'start'">{{ er }}</Typography>
+                                <Typography :size="'sm'" :align="'start'">{{
+                                    er
+                                }}</Typography>
                             </template>
                         </template>
                     </Column>
                 </Column>
-                <Button type="submit" full-width :disabled="!isFormValid || !isFormDirty">
+                <Button
+                    type="submit"
+                    full-width
+                    :disabled="!isFormValid || !isFormDirty"
+                >
                     {{ authContent.buttonText }}
                 </Button>
-                <Typography :size="'sm'" :align="'start'">{{ authFormStore.error }}</Typography>
+                <Typography :size="'sm'" :align="'start'">{{
+                    authFormStore.error
+                }}</Typography>
             </Column>
         </form>
-        <RouterLink :to="authContent.route">
+        <RouterLink :to="authContent.route" @click="authFormStore.resetForm">
             <Typography :weight="500" :align="'center'" class="auth-link">
                 {{ authContent.linkText }}
             </Typography>

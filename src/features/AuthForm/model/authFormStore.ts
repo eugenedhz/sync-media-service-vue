@@ -5,7 +5,6 @@ import { validationRequests } from '../lib/validators/validationHandler';
 
 import { useUserStore } from '@/entities/User';
 
-
 export const authFormNamespace = 'authForm';
 
 export interface AuthFormSchema {
@@ -17,16 +16,20 @@ export interface AuthFormSchema {
     error?: string;
 }
 
-export interface _AuthFormGetterSchema extends _GettersTree<AuthFormSchema> {
-    
-}
+export interface _AuthFormGetterSchema extends _GettersTree<AuthFormSchema> {}
 
 export interface AuthFormActionsSchema {
     signup: () => Promise<void>;
     login: () => Promise<void>;
+    resetForm: () => void;
 }
 
-export const useAuthFormStore = defineStore<string, AuthFormSchema, _AuthFormGetterSchema, AuthFormActionsSchema>(authFormNamespace, {
+export const useAuthFormStore = defineStore<
+    string,
+    AuthFormSchema,
+    _AuthFormGetterSchema,
+    AuthFormActionsSchema
+>(authFormNamespace, {
     state: (): AuthFormSchema => ({
         username: '',
         displayName: '',
@@ -66,5 +69,13 @@ export const useAuthFormStore = defineStore<string, AuthFormSchema, _AuthFormGet
             }
             this.error = validationRequests(loginApi.error);
         },
-    },
+        resetForm() {
+            this.username = '';
+            this.displayName = '';
+            this.email = '';
+            this.password = '';
+            this.repeatPassword = '';
+            this.error = undefined;
+        }
+    }
 });
