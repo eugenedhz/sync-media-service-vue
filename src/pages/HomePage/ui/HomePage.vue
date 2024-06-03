@@ -57,14 +57,14 @@
     </div>
     <div style="display: flex">
         <Row :gap="'32'" full-width>
-            <Card :width="'100px'" height="100px" :material="'qwartz'" />
-            <Card :width="'100px'" height="100px" :material="'qwartz'" framed />
+            <Card :width="'100px'" height="100px" :material="'qwartz-primary'" />
+            <Card :width="'100px'" height="100px" :material="'qwartz-secondary'" framed />
             <Card :width="'100px'" height="100px"></Card>
             <Card :width="'100px'" height="100px" framed />
         </Row>
         <Column>
-            <Card :material="'qwartz'" framed />
-            <Card :material="'qwartz'" framed />
+            <Card :material="'qwartz-primary'" framed />
+            <Card :material="'qwartz-secondary'" framed />
             <Card></Card>
             <Card framed />
         </Column>

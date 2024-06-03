@@ -9,9 +9,14 @@
     backdrop-filter: var(--blur);
 }
 
-.qwartz {
+.qwartz-primary {
     background: var(--qwarz-dark-primary);
     border: var(--border-md) solid var(--qwarz-dark-primary);
+}
+
+.qwartz-secondary {
+    background: var(--qwarz-dark-secondary);
+    border: var(--border-md) solid var(--qwarz-dark-secondary);
 }
 
 .framed {
