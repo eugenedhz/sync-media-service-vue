@@ -10,7 +10,6 @@ module.exports = {
         'plugin:vue/vue3-strongly-recommended',
         'plugin:vue/vue3-recommended',
         '@vue/eslint-config-typescript',
-        'airbnb',
         'prettier',
     ],
     parser:  'vue-eslint-parser',

@@ -10,20 +10,20 @@
     border: var(--border-md) solid var(--qwarz-light-primary);
     box-shadow: var(--shadow);
     backdrop-filter: var(--blur-clear);
-    transition: backdrop-filter var(--transition-speed-medium) linear;     
+    transition: backdrop-filter var(--transition-speed-fast) linear;
 }
 
 .switcher-enabled {
-    transition: backdrop-filter var(--transition-speed-medium) linear;
+    transition: backdrop-filter var(--transition-speed-fast) linear;
     backdrop-filter: var(--blur);
-    box-shadow: var(--switch-shadow);
+    box-shadow: var(--shadow);
 }
 
 .switch {
     pointer-events: none;
     height: 14px;
     width: 20px;
-    transition: var(--transition-speed-fast) cubic-bezier(.4, 0, .2, 1);
+    transition: var(--transition-speed-fast) cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 11px;
     cursor: pointer;
     position: relative;
