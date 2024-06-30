@@ -1,8 +1,65 @@
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+
+import { useCheckboxStore } from '../model/checkboxStore';
+import { useCounterStore } from '../model/counterStore';
+
+import Sample from '@/shared/assets/icons/sample.svg?component';
+import { useFormValidation, Validations } from '@/shared/lib/hooks/useFormValidation';
+import {
+    Button,
+    Tag,
+    Dropdown,
+    Input,
+    Switch,
+    Checkbox,
+    Card,
+    Avatar,
+    Row,
+    Column,
+    Typography
+} from '@/shared/ui';
+
+const counter = useCounterStore();
+const checkboxes = useCheckboxStore();
+
+const enabled = ref(false);
+const input = ref('input');
+
+// validations should be computed
+const validations = computed((): Validations => ({
+    // state pinia example
+    username: {
+        value: checkboxes.input,
+        validations: [
+            (value: string) => value.length > 7 || 'Username must be at least 8 characters long'
+        ]
+    },
+    // state ref example
+    email: {
+        value: input.value,
+        validations: [
+            (value: string) => value.length > 7 || 'Email must be at least 8 characters long',
+            (value: string) => /^[a-zA-Z0-9.@_-]+$/.test(value) || 'Fix error'
+        ]
+    }
+}));
+  
+const { errors, onBlur, onFocus, onChange, isFormDirty, isFormValid } = useFormValidation(validations);
+</script>
+
 <template>
     {{ counter.doubleCount }}
     <hr />
+    <Input v-model="input"/>
     <Button :type="'submit'" @click="counter.increment()">SIGN UP</Button>
     <hr />
+    <template v-for="[name, err] in Object.entries(errors)">
+        <template v-for="error in err.errors" :key="error">
+            <Typography>{{ name }} {{ error }} {{ err.isDirty }}</Typography>
+        </template>
+    </template>
+    <Button>{{ isFormDirty }} {{ isFormValid }}</Button>
     <Button :variant="'outlined'" @click="counter.increment()">SIGN UP</Button>
     <hr />
     <Button :variant="'blured'" @click="counter.increment()">SIGN UP</Button>
@@ -39,11 +96,33 @@
         <Dropdown></Dropdown>
     </div>
     <div>
-        <Input v-model="checkboxes.input" :placeholder="'Search..'" icon-shown @icon-click="() => console.log(input)">
+        <Input 
+            v-model="checkboxes.input" 
+            :placeholder="'Search..'" 
+            icon-shown 
+            @focus="onFocus('username')"
+            @blur="onBlur('username')"
+            @change="onChange('username')"
+            @icon-click="() => console.log(input)"
+        >
             <Sample/>
         </Input>
         {{ checkboxes.inp }}
         <Button full-width>Sign in</Button>
+    </div>
+    <div>
+        <Input 
+            v-model="input" 
+            :placeholder="'Search..'" 
+            icon-shown 
+            @focus="onFocus('email')"
+            @blur="onBlur('email')"
+            @change="onChange('email')"
+            @icon-click="() => console.log(input)"
+        >
+            <Sample/>
+        </Input>
+        {{ input }}
     </div>
     <Switch v-model="enabled" :value="'valuye'" />
     <div style="display:flex">
@@ -79,35 +158,6 @@
     <Avatar :src="'https://w.wallhaven.cc/full/95/wallhaven-95vk3w.png'" />
     <Typography :weight="600" :as="'p'" :align="'center'" :size="'xl'" uppercase>dsad</Typography>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-
-import { useCheckboxStore } from '../model/checkboxStore';
-import { useCounterStore } from '../model/counterStore';
-
-import Sample from '@/shared/assets/icons/sample.svg?component';
-import {
-    Button,
-    Tag,
-    Dropdown,
-    Input,
-    Switch,
-    Checkbox,
-    Card,
-    Avatar,
-    Row,
-    Column,
-    Typography
-} from '@/shared/ui';
-
-const counter = useCounterStore();
-const checkboxes = useCheckboxStore();
-
-const enabled = ref(false);
-const input = ref('input');
-
-</script>
 
 <style>
 @import './HomePage';

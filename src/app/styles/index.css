@@ -4,6 +4,10 @@
 
 body {
     font: var(--font-m);
-    background-image: url('/src/shared/assets/img/checkers.png');
+    background: var(--qwarz-dark-primary);
     margin: 0 auto;
+}
+
+#app {
+    min-height: 100vh;
 }

@@ -1,7 +1,9 @@
 import { RouteRecordRaw } from 'vue-router';
 
 import { HomePage } from '@/pages/HomePage';
-import { Routes, getRouteHome } from '@/shared/consts/router';
+import { LogInPage } from '@/pages/LogInPage';
+import { SignUpPage } from '@/pages/SignUpPage';
+import { Routes, getRouteHome, getRouteLogIn, getRouteSignUp } from '@/shared/consts/router';
 
 export const routes: RouteRecordRaw[] = [
     {
@@ -9,4 +11,14 @@ export const routes: RouteRecordRaw[] = [
         name: Routes.HOME,
         component: HomePage
     },
+    {
+        path: getRouteLogIn(),
+        name: Routes.LOGIN,
+        component: LogInPage
+    },
+    {
+        path: getRouteSignUp(),
+        name: Routes.SIGNUP,
+        component: SignUpPage
+    }
 ];

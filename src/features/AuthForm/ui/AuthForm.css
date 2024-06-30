@@ -1,0 +1,12 @@
+.auth-form {
+    max-width: 704px;
+}
+
+form {
+    width: 100%;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+    cursor: default;
+}

@@ -1,7 +1,13 @@
 <script lang="ts" setup>
 import { computed, defineProps } from 'vue';
 
-defineEmits(['update:modelValue', 'iconClick']);
+defineEmits([
+    'update:modelValue', 
+    'iconClick', 
+    'blur',
+    'focus',
+    'change'
+]);
 const props = defineProps({
     disabled: {
         type: Boolean,
@@ -21,6 +27,10 @@ const props = defineProps({
     iconShown: {
         type: Boolean,
         default: false
+    },
+    type: {
+        type: String,
+        default: 'text'
     }
 });
 
@@ -36,15 +46,22 @@ const classes = computed(() => ({
             :class="classes"
             :value="modelValue"
             :placeholder="placeholder"
+            :type="type"
+            @blur="$emit('blur')"
+            @focus="$emit('focus')"
             @input="
                 $emit(
                     'update:modelValue',
+                    ($event.target as HTMLInputElement).value
+                );
+                $emit(
+                    'change',
                     ($event.target as HTMLInputElement).value
                 )
             "
         />
         <template v-if="iconShown">
-            <button @click="$emit('iconClick')">
+            <button type="button" @click="$emit('iconClick')">
                 <slot></slot>
             </button>
         </template>

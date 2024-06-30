@@ -1,14 +1,18 @@
-<template>
-    <div style="max-width: 1296px; margin: 0 auto;">
-        <router-view />
-    </div>
-</template>
+<script setup lang="ts">
+import { onMounted } from 'vue';
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+import { useUserStore } from '@/entities/User';
 
-export default defineComponent({});
+const userStore = useUserStore();
+
+onMounted(() => {
+    userStore.checkAuth();
+});
 </script>
+
+<template>
+    <router-view />
+</template>
 
 <style>
 @import './styles';
