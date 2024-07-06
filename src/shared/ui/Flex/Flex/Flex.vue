@@ -38,7 +38,7 @@ const justifyClasses: Record<FlexJustify, string> = {
 const alignClasses: Record<FlexAlign, string> = {
     start: 'align-start',
     center: 'align-center',
-    end: 'alignEnd',
+    end: 'align-end',
 }; 
 
 const directionClasses: Record<FlexDirection, string> = {
