@@ -35,26 +35,26 @@ const justifyClasses: Record<FlexJustify, string> = {
     start: 'justify-start',
     center: 'justify-center',
     end: 'justify-end',
-    between: 'justify-between',
-}; 
+    between: 'justify-between'
+};
 
 const alignClasses: Record<FlexAlign, string> = {
     start: 'align-start',
     center: 'align-center',
     end: 'align-end',
     stretch: 'align-stretch'
-}; 
+};
 
 const directionClasses: Record<FlexDirection, string> = {
     row: 'direction-row',
-    column: 'direction-column',
+    column: 'direction-column'
 };
 
 const gapClasses: Record<FlexGap, string> = {
     4: 'gap4',
     8: 'gap8',
     16: 'gap16',
-    32: 'gap32',
+    32: 'gap32'
 };
 
 const classes = computed(() => ({
@@ -68,11 +68,12 @@ const classes = computed(() => ({
 </script>
 
 <template>
-    <div class="flex" :class="classes">
+    <div class="flex ilow-scroll" :class="classes">
         <slot></slot>
     </div>
 </template>
 
 <style lang="css" scoped>
 @import url('./Flex.css');
+@import url('@/app/styles/scrollbar.css');
 </style>

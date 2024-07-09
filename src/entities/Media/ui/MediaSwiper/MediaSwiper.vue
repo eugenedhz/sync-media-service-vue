@@ -6,7 +6,7 @@ import { __BASE_URL__ } from '@/shared/config/environment';
 // import MediaDetailsCard from '../MediaDetailsCard/ui'
 import 'swiper/css';
 
-import { Checkbox } from '@/shared/ui'; 
+import { Checkbox } from '@/shared/ui';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 
@@ -15,16 +15,16 @@ import { Pagination, Scrollbar, A11y, Autoplay } from 'swiper/modules';
 export default {
     components: {
         Swiper,
-        SwiperSlide,
+        SwiperSlide
     },
     data() {
         return {
-          url: __BASE_URL__
-        }
+            url: __BASE_URL__
+        };
     },
     setup() {
         return {
-            modules: [Pagination, Scrollbar, A11y, Autoplay],
+            modules: [Pagination, Scrollbar, A11y, Autoplay]
         };
     },
     props: {
@@ -34,23 +34,32 @@ export default {
 </script>
 
 <template>
-  <div>
-    <swiper 
-      class="sliderWrapper"
-      style="max-width: 1268px; width: 100%; border-radius: 15px;" 
-      :modules="modules"
-      :pagination="{ clickable: true }" 
-      :autoplay="{ delay: 4000, disableOnInteraction: false }"
-    >
-      <template v-for="media in medias" :key="media.id" :virtualIndex="media.id">
-        <swiper-slide :height="'371px'">
-          <div>
-            <img :width="'100%'" style=" object-fit: cover;" :height="'371px'" :src="url + media.preview" />
-          </div>
-        </swiper-slide>
-      </template>
-    </swiper>
-  </div>
+    <div>
+        <swiper
+            class="sliderWrapper"
+            style="max-width: 1268px; width: 100%; border-radius: 15px"
+            :modules="modules"
+            :pagination="{ clickable: true }"
+            :autoplay="{ delay: 5000, disableOnInteraction: false }"
+        >
+            <template
+                v-for="media in medias"
+                :key="media.id"
+                :virtualIndex="media.id"
+            >
+                <swiper-slide :height="'371px'">
+                    <div>
+                        <img
+                            :width="'100%'"
+                            style="object-fit: cover"
+                            :height="'371px'"
+                            :src="url + media.preview"
+                        />
+                    </div>
+                </swiper-slide>
+            </template>
+        </swiper>
+    </div>
 </template>
 
 <style scoped lang="css">

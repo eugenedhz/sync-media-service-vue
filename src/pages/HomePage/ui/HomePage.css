@@ -1,10 +1,10 @@
 html {
 }
 
-.room-overflow {
+/* .room-overflow {
     max-width: 1440px;
-    overflow: auto;
-}
+    overflow: hidden;
+} */
 
 .padding {
     padding: 32px;

@@ -73,4 +73,7 @@
     --transition-speed-fast: 0.2s;
     --transition-speed-medium: 0.75s;
     --transition-speed-slow: 1s;
+
+    /* Utils */
+    --transparent-color: 00000000;
 }

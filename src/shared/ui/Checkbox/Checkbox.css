@@ -14,7 +14,7 @@ label {
     user-select: none;
     width: 24px;
     height: 24px;
-    border-radius: 11px;
+    border-radius: 10px;
     border: var(--border-md) solid var(--qwarz-light-primary);
     cursor: pointer;
     box-shadow: var(--shadow);
@@ -25,8 +25,8 @@ label {
     user-select: none;
     border-radius: 11px;
     cursor: pointer;
-    width: 21px;
-    height: 21px;
+    width: 20px;
+    height: 20px;
     backdrop-filter: var(--blur-clear);
     z-index: -1;
     transition: backdrop-filter var(--transition-speed-fast);
