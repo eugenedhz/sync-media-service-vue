@@ -57,10 +57,7 @@ const { floatingStyles } = useFloating(reference, floating, {
                     </MenuItem>
                 </template>
                 <template v-else>
-                    <MenuItem
-                        v-slot="{ active }"
-                        :disabled="item?.disabled"
-                    >
+                    <MenuItem v-slot="{ active }" :disabled="item?.disabled">
                         <button
                             :class="{ selected: active }"
                             class="item"

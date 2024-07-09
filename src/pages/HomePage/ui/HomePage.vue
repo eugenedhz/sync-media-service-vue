@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue';
 import { Page } from '@/widgets/Page';
-import { useFriendsApi, useUserStore, UserLabelList, User } from '@/entities/User';
-import { __BASE_URL__ } from '@/shared/config/environment'
+import {
+    useFriendsApi,
+    useUserStore,
+    UserLabelList,
+    User
+} from '@/entities/User';
+import { __BASE_URL__ } from '@/shared/config/environment';
 import { MediaGrid } from '@/features/MediaGrid';
 import { fetchAllMedias, MediaWithGenres } from '@/entities/Media/api/requests';
 import { MediaSwiper } from '@/entities/Media';
@@ -11,8 +16,7 @@ import { Column, Typography, Row } from '@/shared/ui';
 import { useRouter } from 'vue-router';
 import { getRouteRoom, Routes } from '@/shared/consts/router';
 
-
-const userStore = useUserStore()
+const userStore = useUserStore();
 const friendsApi = useFriendsApi();
 const roomsApi = useGetAllRoomsApi();
 const isFriendsIsLoading = ref<boolean>(false);
@@ -22,15 +26,15 @@ const router = useRouter();
 const mediaRows = ref<MediaWithGenres[][] | undefined>([]);
 const fetchMedias = async () => {
     try {
-        isFriendsIsLoading.value = true
+        isFriendsIsLoading.value = true;
         const mediasQueries = [];
 
         for (let i = 0; i < 4; i++) {
-            mediasQueries.push(fetchAllMedias({ limit: 10, offset: i }))
+            mediasQueries.push(fetchAllMedias({ limit: 10, offset: i }));
         }
 
         const response = await Promise.all(mediasQueries);
-   
+
         for (let i = 0; i < response.length; i++) {
             mediaRows.value?.push(response[i].data);
         }
@@ -39,7 +43,7 @@ const fetchMedias = async () => {
     } finally {
         isFriendsIsLoading.value = false;
     }
-}
+};
 
 const fetchFriends = () => {
     if (!userStore?.authData?.id) {
@@ -50,73 +54,77 @@ const fetchFriends = () => {
         params: {
             id: userStore?.authData.id
         }
-    })
-}
+    });
+};
 
 const navigateToRoom = (room: Room) => {
-    router.push({ name: Routes.ROOM, params: {
+    router.push({
+        name: Routes.ROOM,
+        params: {
             id: room.id
-        }  
-    })
-}
+        }
+    });
+};
 
 const navigateToProfile = (user: User) => {
-    router.push({ name: Routes.PROFILE, params: {
+    router.push({
+        name: Routes.PROFILE,
+        params: {
             id: user.id
-        }  
-    })
-}
+        }
+    });
+};
 
-onMounted(async() => {
-    await Promise.all([
-    fetchMedias(),
-    fetchFriends(),
-    roomsApi.initiate()
-    ])
-})
-
-
+onMounted(async () => {
+    await Promise.all([fetchMedias(), fetchFriends(), roomsApi.initiate()]);
+});
 </script>
 
 <template>
     <template v-if="friendsApi?.data && roomsApi?.data && mediaRows">
-    <div class="background">
-        <Page >
+        <div class="background">
+            <Page>
                 <Column :align="'start'" :gap="'16'" class="padding">
                     <Row :align="'stretch'" :gap="'16'">
-                        <UserLabelList 
+                        <UserLabelList
+                            v-if="
+                                friendsApi?.data && friendsApi.data.length > 0
+                            "
                             @user-click="navigateToProfile($event)"
-                            style="  overflow-y: scroll;" 
+                            class="ilow-scroll"
                             :users="friendsApi?.data || []"
                             :is-loading="isFriendsIsLoading"
                         />
-                        <MediaSwiper :medias="mediaRows?.[0]"/>
+                        <MediaSwiper :medias="mediaRows?.[0]" />
                     </Row>
                     <Column :gap="'16'" :align="'start'">
-                        <Typography :size="'xl'" :weight="600">Rooms</Typography>
-                        <div class="room-overflow">
-                            <RoomCardList 
+                        <Typography :size="'xl'" :weight="600"
+                            >Rooms</Typography
+                        >
+                        <div class="ilow-scroll room-overflow">
+                            <RoomCardList
+                                v-if="
+                                    roomsApi?.data && roomsApi.data.length > 0
+                                "
                                 @room-click="navigateToRoom($event)"
-                                class="padding-left" 
+                                class="padding-left"
                                 :rooms="roomsApi?.data"
                             />
                         </div>
                     </Column>
                 </Column>
-        </Page>
-    </div>
-    <div class="dark">
-            <Page>
-                <MediaGrid :media-rows="mediaRows">
-                    Hot
-                </MediaGrid>
             </Page>
-    </div>
-</template>
-
+        </div>
+        <div class="dark">
+            <Page>
+                <MediaGrid :media-rows="mediaRows"> Hot </MediaGrid>
+            </Page>
+        </div>
+    </template>
 </template>
 
 <style scoped lang="css">
+@import url('@/app/styles/scrollbar.css');
 .background {
     background: linear-gradient(108deg, #ff7a00 0%, #b82020 100%) no-repeat;
 }

@@ -15,7 +15,6 @@
     outline: none;
 }
 
-
 a,
 a:visited {
     text-decoration: none;
@@ -63,7 +62,6 @@ button::-moz-focus-inner {
 
 ul li {
     list-style: none;
-
 }
 
 img {

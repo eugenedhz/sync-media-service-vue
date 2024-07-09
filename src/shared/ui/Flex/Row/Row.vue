@@ -37,3 +37,5 @@ defineProps({
         <slot></slot>
     </Flex>
 </template>
+
+<style></style>
