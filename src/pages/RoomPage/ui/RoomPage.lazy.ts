@@ -1,0 +1,1 @@
+export const RoomPageLazy = () => import('./RoomPage.vue');

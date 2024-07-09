@@ -18,7 +18,7 @@ export interface ApiActionsSchema<Entity, Body> {
     _setData(data?: Entity): void;
     _setError(error?: string): void; 
     _setIsLoading(isLoading: boolean): void;
-    initiate(body: Body extends Record<string, any> ? Body : void): Promise<Entity | undefined>; 
+    initiate(body: Body extends Record<string, any> ? Body : void, options?: AxiosRequestConfig<Body>): Promise<Entity | undefined>; 
 }
 
 export const buildApi = <Entity, Body = void>(
@@ -48,12 +48,13 @@ export const buildApi = <Entity, Body = void>(
                     isLoading
                 });
             },
-            async initiate(body: Body extends Record<string, any> ? Body : undefined): Promise<Entity | undefined> {
+            async initiate(body: Body extends Record<string, any> ? Body : undefined, options? : AxiosRequestConfig<Body>): Promise<Entity | undefined> {
                 this._setIsLoading(true);
 
                 try {
                     const response = await api.request<Entity, AxiosResponse<Entity, Body>, Body>({
                         ...config,
+                        ...options,
                         data: body
                     });
 

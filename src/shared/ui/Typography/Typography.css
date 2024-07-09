@@ -7,6 +7,14 @@
     color:  var(--qwarz-light-primary);
 }
 
+.pale {
+    color: var(--qwarz-light-tertiary);
+}
+
+.inverted {
+    color:  var(--qwarz-dark-primary);
+}
+
 .typographyle {
     color: rgb(var(--qwarz-light-primary-value) / 30%)
 }

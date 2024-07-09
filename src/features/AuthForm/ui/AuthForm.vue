@@ -8,6 +8,8 @@ import { AuthType } from '../model/types/authType';
 
 import { useFormValidation } from '@/shared/lib/hooks/useFormValidation';
 import { Input, Row, Column, Button, Typography } from '@/shared/ui';
+import { useRouter } from 'vue-router';
+import { Routes } from '@/shared/consts/router'
 
 const props = defineProps({
     type: {
@@ -16,6 +18,8 @@ const props = defineProps({
     }
 });
 
+
+const router = useRouter()
 const authFormStore = useAuthFormStore();
 
 const authType = props.type;
@@ -146,12 +150,13 @@ const togglePasswordsVisibility = (passwordField: string) => {
     isRepeatPasswordVisible.value = !isRepeatPasswordVisible.value;
 };
 
-const submitForm = () => {
+const submitForm = async () => {
     if (authType === 'signup') {
-        authFormStore.signup();
-        return;
+        await authFormStore.signup();
+    } else {
+        await authFormStore.login();
     }
-    authFormStore.login();
+    router.push({ name: Routes.HOME })
 };
 </script>
 <template>

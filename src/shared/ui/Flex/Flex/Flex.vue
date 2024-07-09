@@ -2,7 +2,7 @@
 import { PropType, computed } from 'vue';
 
 export type FlexJustify = 'start' | 'center' | 'end' | 'between';
-export type FlexAlign = 'start' | 'center' | 'end';
+export type FlexAlign = 'start' | 'center' | 'end' | 'stretch';
 export type FlexDirection = 'row' | 'column';
 export type FlexGap = '4' | '8' | '16' | '32';
 
@@ -25,6 +25,9 @@ const props = defineProps({
     },
     fullWidth: {
         type: Boolean
+    },
+    fullHeight: {
+        type: Boolean
     }
 });
 
@@ -38,7 +41,8 @@ const justifyClasses: Record<FlexJustify, string> = {
 const alignClasses: Record<FlexAlign, string> = {
     start: 'align-start',
     center: 'align-center',
-    end: 'alignEnd',
+    end: 'align-end',
+    stretch: 'align-stretch'
 }; 
 
 const directionClasses: Record<FlexDirection, string> = {
@@ -58,7 +62,8 @@ const classes = computed(() => ({
     [alignClasses[props.align]]: true,
     [directionClasses[props.direction]]: true,
     [gapClasses[props.gap]]: true,
-    'full-width': props.fullWidth
+    'full-width': props.fullWidth,
+    'full-height': props.fullHeight
 }));
 </script>
 

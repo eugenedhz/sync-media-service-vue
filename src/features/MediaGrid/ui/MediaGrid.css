@@ -1,0 +1,38 @@
+.media-padding {
+    padding: 0 32px;
+}
+
+.padding {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.row {
+    position: relative;
+}
+
+.row::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    box-shadow: -33px 0 33px -33px var(--qwarz-dark-primary) inset;
+    pointer-events: none;
+}
+.row::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    box-shadow: 33px 0 33px -33px var(--qwarz-dark-primary) inset;
+    pointer-events: none;
+}
+
+.media-overflow {
+    max-width: 1440px;
+    overflow: auto;
+}

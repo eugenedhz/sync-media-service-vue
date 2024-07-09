@@ -14,7 +14,11 @@ class SocketService {
 
     setup() {
         if (!this._socket || this._socket?.disconnected) {
-            this._socket = io(this._url);
+            this._socket = io(this._url, {
+                withCredentials: true,
+                reconnection: true,
+                reconnectionAttempts: 3
+            });
         }
     }
 
@@ -24,7 +28,7 @@ class SocketService {
         }
     }
 
-    get getSocket(): SocketImplementation {
+    get socket(): SocketImplementation {
         return this._socket as SocketImplementation;
     }
 }

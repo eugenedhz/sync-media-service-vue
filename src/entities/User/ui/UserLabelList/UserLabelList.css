@@ -1,0 +1,5 @@
+.inline {
+    display: inline-block;
+    box-shadow: var(--shadow);
+    border-radius: 20px;
+}

@@ -1,165 +1,136 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { onMounted, ref } from 'vue'
+import { Page } from '@/widgets/Page';
+import { useFriendsApi, useUserStore, UserLabelList, User } from '@/entities/User';
+import { __BASE_URL__ } from '@/shared/config/environment'
+import { MediaGrid } from '@/features/MediaGrid';
+import { fetchAllMedias, MediaWithGenres } from '@/entities/Media/api/requests';
+import { MediaSwiper } from '@/entities/Media';
+import { RoomCardList, useGetAllRoomsApi, Room } from '@/entities/Room';
+import { Column, Typography, Row } from '@/shared/ui';
+import { useRouter } from 'vue-router';
+import { getRouteRoom, Routes } from '@/shared/consts/router';
 
-import { useCheckboxStore } from '../model/checkboxStore';
-import { useCounterStore } from '../model/counterStore';
 
-import Sample from '@/shared/assets/icons/sample.svg?component';
-import { useFormValidation, Validations } from '@/shared/lib/hooks/useFormValidation';
-import {
-    Button,
-    Tag,
-    Dropdown,
-    Input,
-    Switch,
-    Checkbox,
-    Card,
-    Avatar,
-    Row,
-    Column,
-    Typography
-} from '@/shared/ui';
+const userStore = useUserStore()
+const friendsApi = useFriendsApi();
+const roomsApi = useGetAllRoomsApi();
+const isFriendsIsLoading = ref<boolean>(false);
 
-const counter = useCounterStore();
-const checkboxes = useCheckboxStore();
+const router = useRouter();
 
-const enabled = ref(false);
-const input = ref('input');
+const mediaRows = ref<MediaWithGenres[][] | undefined>([]);
+const fetchMedias = async () => {
+    try {
+        isFriendsIsLoading.value = true
+        const mediasQueries = [];
 
-// validations should be computed
-const validations = computed((): Validations => ({
-    // state pinia example
-    username: {
-        value: checkboxes.input,
-        validations: [
-            (value: string) => value.length > 7 || 'Username must be at least 8 characters long'
-        ]
-    },
-    // state ref example
-    email: {
-        value: input.value,
-        validations: [
-            (value: string) => value.length > 7 || 'Email must be at least 8 characters long',
-            (value: string) => /^[a-zA-Z0-9.@_-]+$/.test(value) || 'Fix error'
-        ]
+        for (let i = 0; i < 4; i++) {
+            mediasQueries.push(fetchAllMedias({ limit: 10, offset: i }))
+        }
+
+        const response = await Promise.all(mediasQueries);
+   
+        for (let i = 0; i < response.length; i++) {
+            mediaRows.value?.push(response[i].data);
+        }
+    } catch (error) {
+        console.log(error);
+    } finally {
+        isFriendsIsLoading.value = false;
     }
-}));
-  
-const { errors, onBlur, onFocus, onChange, isFormDirty, isFormValid } = useFormValidation(validations);
+}
+
+const fetchFriends = () => {
+    if (!userStore?.authData?.id) {
+        return;
+    }
+
+    friendsApi.initiate(undefined, {
+        params: {
+            id: userStore?.authData.id
+        }
+    })
+}
+
+const navigateToRoom = (room: Room) => {
+    router.push({ name: Routes.ROOM, params: {
+            id: room.id
+        }  
+    })
+}
+
+const navigateToProfile = (user: User) => {
+    router.push({ name: Routes.PROFILE, params: {
+            id: user.id
+        }  
+    })
+}
+
+onMounted(async() => {
+    await Promise.all([
+    fetchMedias(),
+    fetchFriends(),
+    roomsApi.initiate()
+    ])
+})
+
+
 </script>
 
 <template>
-    {{ counter.doubleCount }}
-    <hr />
-    <Input v-model="input"/>
-    <Button :type="'submit'" @click="counter.increment()">SIGN UP</Button>
-    <hr />
-    <template v-for="[name, err] in Object.entries(errors)">
-        <template v-for="error in err.errors" :key="error">
-            <Typography>{{ name }} {{ error }} {{ err.isDirty }}</Typography>
-        </template>
-    </template>
-    <Button>{{ isFormDirty }} {{ isFormValid }}</Button>
-    <Button :variant="'outlined'" @click="counter.increment()">SIGN UP</Button>
-    <hr />
-    <Button :variant="'blured'" @click="counter.increment()">SIGN UP</Button>
-    <hr />
-    <Button disabled @click="counter.increment()">SIGN UP</Button>
-    <hr />
-    <Button :variant="'cleared'" @click="counter.increment()">SIGN UP</Button>
-    <hr />
-    <div>
-        <Tag> Arthous </Tag>
+    <template v-if="friendsApi?.data && roomsApi?.data && mediaRows">
+    <div class="background">
+        <Page >
+                <Column :align="'start'" :gap="'16'" class="padding">
+                    <Row :align="'stretch'" :gap="'16'">
+                        <UserLabelList 
+                            @user-click="navigateToProfile($event)"
+                            style="  overflow-y: scroll;" 
+                            :users="friendsApi?.data || []"
+                            :is-loading="isFriendsIsLoading"
+                        />
+                        <MediaSwiper :medias="mediaRows?.[0]"/>
+                    </Row>
+                    <Column :gap="'16'" :align="'start'">
+                        <Typography :size="'xl'" :weight="600">Rooms</Typography>
+                        <div class="room-overflow">
+                            <RoomCardList 
+                                @room-click="navigateToRoom($event)"
+                                class="padding-left" 
+                                :rooms="roomsApi?.data"
+                            />
+                        </div>
+                    </Column>
+                </Column>
+        </Page>
     </div>
-    <div style="display: flex; justify-content: space-between">
-        <Dropdown
-            :items="[
-                {
-                    content: 'disabled',
-                    disabled: true,
-                    href: 'https://www.youtube.com/'
-                },
-                {
-                    content: 'enabled',
-                    href: 'https://www.youtube.com/'
-                },
-                {
-                    content: 'disabled',
-                    disabled: true,
-                },
-                {
-                    content: 'enabled',
-                },
-            ]"
-            @select="(item) => console.log(item)"
-        ></Dropdown>
-        <Dropdown></Dropdown>
+    <div class="dark">
+            <Page>
+                <MediaGrid :media-rows="mediaRows">
+                    Hot
+                </MediaGrid>
+            </Page>
     </div>
-    <div>
-        <Input 
-            v-model="checkboxes.input" 
-            :placeholder="'Search..'" 
-            icon-shown 
-            @focus="onFocus('username')"
-            @blur="onBlur('username')"
-            @change="onChange('username')"
-            @icon-click="() => console.log(input)"
-        >
-            <Sample/>
-        </Input>
-        {{ checkboxes.inp }}
-        <Button full-width>Sign in</Button>
-    </div>
-    <div>
-        <Input 
-            v-model="input" 
-            :placeholder="'Search..'" 
-            icon-shown 
-            @focus="onFocus('email')"
-            @blur="onBlur('email')"
-            @change="onChange('email')"
-            @icon-click="() => console.log(input)"
-        >
-            <Sample/>
-        </Input>
-        {{ input }}
-    </div>
-    <Switch v-model="enabled" :value="'valuye'" />
-    <div style="display:flex">
-        <Checkbox
-            v-for="checkbox in checkboxes.checkbox"
-            :key="checkbox.name"
-            :name="checkbox.name"
-            :checked="checkbox.checked"
-            @check="checkboxes.check(checkbox)"
-        />
-    </div>
-    <div style="display: flex">
-        <Row :gap="'32'" full-width>
-            <Card :width="'100px'" height="100px" :material="'qwartz-primary'" />
-            <Card :width="'100px'" height="100px" :material="'qwartz-secondary'" framed />
-            <Card :width="'100px'" height="100px"></Card>
-            <Card :width="'100px'" height="100px" framed />
-        </Row>
-        <Column>
-            <Card :material="'qwartz-primary'" framed />
-            <Card :material="'qwartz-secondary'" framed />
-            <Card></Card>
-            <Card framed />
-        </Column>
-    </div>
-    <Avatar
-        :src="'http://i07.fotocdn.net/s124/e002875bda4ec088/gallery_xl/2825242466.jpg'"
-    />
-    <Avatar :src="'https://v1.popcornnews.ru/k2/news/1200/upload/wcTTcx.jpg'" />
-    <Avatar
-        :src="'https://i.pinimg.com/originals/75/0c/2b/750c2bf45eda818d53320b5607df7017.jpg'"
-    />
-    <Avatar :src="'https://w.wallhaven.cc/full/95/wallhaven-95vk3w.png'" />
-    <Typography :weight="600" :as="'p'" :align="'center'" :size="'xl'" uppercase>dsad</Typography>
 </template>
 
-<style>
-@import './HomePage';
+</template>
+
+<style scoped lang="css">
+.background {
+    background: linear-gradient(108deg, #ff7a00 0%, #b82020 100%) no-repeat;
+}
+
+.dark {
+    background: var(--qwarz-dark-primary);
+}
+
+.room-overflow {
+    max-width: 1440px;
+    overflow: auto;
+}
+
+.padding {
+    padding: 32px;
+}
 </style>
-../model/exampleStore

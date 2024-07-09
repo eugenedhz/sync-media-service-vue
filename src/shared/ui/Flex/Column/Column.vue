@@ -18,6 +18,9 @@ defineProps({
     },
     fullWidth: {
         type: Boolean
+    },
+    fullHeight: {
+        type: Boolean
     }
 });
 </script>
@@ -29,6 +32,7 @@ defineProps({
         :justify="justify"
         :gap="gap"
         :full-width="fullWidth"
+        :full-height="fullHeight"
     >
         <slot></slot>
     </Flex>

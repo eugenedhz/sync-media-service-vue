@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { PropType, computed } from 'vue';
+import { Image } from '@/shared/ui';
 
 export type CardContainerMaterial = 'qwartz-primary' | 'qwartz-secondary';
 
@@ -35,7 +36,7 @@ const classes = computed(() => ({
             <slot></slot>
         </div>
         <div class="card-container__background">
-            <img class="card-container__image" :src="image" />
+            <Image class="card-container__image" :src="image" />
         </div>
     </div>
 </template>

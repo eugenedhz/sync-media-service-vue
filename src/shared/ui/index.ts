@@ -9,6 +9,7 @@ import Input from './Input/Input.vue';
 import Switch from './Switch/Switch.vue';
 import Tag from './Tag/Tag.vue';
 import Typography from './Typography/Typography.vue';
+import Image from './Image/Image.vue';
 import CardContainerWithImage from './CardContainerWithImage/CardContainerWithImage.vue';
 
 export {
@@ -23,5 +24,6 @@ export {
     Row,
     Column,
     Typography,
+    Image,
     CardContainerWithImage
 };

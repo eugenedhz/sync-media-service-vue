@@ -4,7 +4,7 @@ import { PropType, computed } from 'vue';
 export type TypographySize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 export type TypographyAlign = 'auto' | 'start' | 'center' | 'end' | 'justify';
 export type TypographyWeight = 400 | 500 | 600 | 700;
-export type TypographyColor = 'primary' | 'pale';
+export type TypographyColor = 'primary' | 'pale' | 'inverted';
 
 const props = defineProps({
     color: {
@@ -35,6 +35,12 @@ const props = defineProps({
     }
 });
 
+const textColor: Record<TypographyColor, string> = {
+    primary: 'primary',
+    pale: 'pale',
+    inverted: 'inverted'
+}
+
 const textSize: Record<TypographySize, string> = {
     sm: 'size-sm',
     md: 'size-md',
@@ -59,6 +65,7 @@ const textWeight: Record<TypographyWeight, string> = {
 };
 
 const classes = computed(() => ({
+    [textColor[props.color]]: true,
     [textWeight[props.weight]]: true,
     [textAlign[props.align]]: true,
     [textSize[props.size]]: true,

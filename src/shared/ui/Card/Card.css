@@ -1,6 +1,7 @@
 .card {
     box-shadow: var(--shadow);
     border-radius: 10px;
+    overflow: hidden;
 }
 
 .glass {
@@ -19,6 +20,11 @@
     border: var(--border-md) solid var(--qwarz-dark-secondary);
 }
 
+.qwartz-inverted {
+    background: var(--qwarz-light-secondary);
+    border: var(--border-md) solid var(--qwarz-light-secondary);
+}
+
 .framed {
     border: var(--border-md) solid var(--qwarz-light-primary);
     background: rgb(var(--qwarz-light-primary-value) / 1%);
@@ -28,6 +34,23 @@
     padding: 16px;
 }
 
+.padding-md {
+    padding: 16px;
+}
+
+.padding-sm {
+    padding: 8px;
+}
+
+.padding-none{
+    padding: 0;
+}
+
 .full-width {
     width: 100%;
 }
+
+.top-shadow {
+    box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.25); 
+}
+

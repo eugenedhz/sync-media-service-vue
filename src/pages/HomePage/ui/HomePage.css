@@ -1,0 +1,11 @@
+html {
+}
+
+.room-overflow {
+    max-width: 1440px;
+    overflow: auto;
+}
+
+.padding {
+    padding: 32px;
+}

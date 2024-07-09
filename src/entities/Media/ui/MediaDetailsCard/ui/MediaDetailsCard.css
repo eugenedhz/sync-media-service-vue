@@ -1,0 +1,16 @@
+.half-width {
+    width: 50%;
+
+}
+
+.card-height {
+    height: 329px;
+}
+
+.text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+}

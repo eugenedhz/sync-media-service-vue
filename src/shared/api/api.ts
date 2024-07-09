@@ -25,19 +25,20 @@ api.interceptors.response.use(
         if (isStatusUnauthorized && isSameRequest && !isRetry && loggedIn) {
             originalRequest._isRetry = true;
             try {
-                await api.post(
+                const response = await api.post(
                     '/auth/refresh',
                     {},
                     { withCredentials: true }
                 );
+
+                localStorage.setItem(USER_LOCAL_STORAGE_KEY, response.data)
+
                 return api.request(originalRequest);
             } catch (e) {
                 console.error('Refresh token error: ', e);
             }
         }
-        else {
-            localStorage.removeItem(USER_LOCAL_STORAGE_KEY); // если все токены истекли, чтобы не оставались данные пользователя в сторадже, мб это надо как-то где-то по-другому делать, но я сделала временное решение, чтобы не возникало жесткого бага при входе на сайт спустя некоторое время
-        }
+        
         throw error;
     }
 );
