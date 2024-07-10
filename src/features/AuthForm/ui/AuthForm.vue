@@ -12,6 +12,7 @@ import { useRouter } from 'vue-router';
 import { Routes } from '@/shared/consts/router';
 
 import Logo from '@/shared/assets/icons/logo.svg?component';
+import { socketService } from '@/shared/api';
 
 const props = defineProps({
     type: {
@@ -160,6 +161,7 @@ const submitForm = async () => {
     }
     router.push({ name: Routes.HOME });
     authFormStore.resetForm();
+    socketService.setup();
 };
 </script>
 <template>
