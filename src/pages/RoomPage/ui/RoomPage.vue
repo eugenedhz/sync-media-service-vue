@@ -359,6 +359,7 @@ const onLeave = () => {
                                     <Column :align="'center'">
                                         <div
                                             ref="chatWindow"
+                                            class="ilow-scroll"
                                             style="
                                                 overflow-y: auto;
                                                 height: 330px;
