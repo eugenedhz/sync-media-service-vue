@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PropType, computed } from 'vue';
 
-export type CardMaterial = 'glass' | 'qwartz-primary' | 'qwartz-secondary' | 'qwarz-inverted';
+export type CardMaterial = 'glass' | 'qwartz-primary' | 'qwartz-secondary' | 'qwartz-inverted';
 export type CardPadding = 'sm' | 'md' | 'none';
 
 const props = defineProps({

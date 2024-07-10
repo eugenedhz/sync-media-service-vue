@@ -415,7 +415,7 @@ const onLeave = () => {
                                                                     .userId ===
                                                                 userStore!
                                                                     .authData!.id
-                                                                    ? 'qwarz-inverted'
+                                                                    ? 'qwartz-inverted'
                                                                     : 'qwartz-secondary'
                                                             "
                                                             style="
