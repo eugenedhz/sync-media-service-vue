@@ -26,7 +26,7 @@ const floating = ref(null);
 const { floatingStyles } = useFloating(reference, floating, {
     middleware: [
         autoPlacement({
-            allowedPlacements: ['left-start', 'right-start'],
+            allowedPlacements: ['left-start', 'right-start', 'bottom'],
             crossAxis: true
         }),
         offset(10)

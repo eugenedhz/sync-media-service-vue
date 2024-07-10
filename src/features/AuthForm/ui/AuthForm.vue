@@ -9,7 +9,9 @@ import { AuthType } from '../model/types/authType';
 import { useFormValidation } from '@/shared/lib/hooks/useFormValidation';
 import { Input, Row, Column, Button, Typography } from '@/shared/ui';
 import { useRouter } from 'vue-router';
-import { Routes } from '@/shared/consts/router'
+import { Routes } from '@/shared/consts/router';
+
+import Logo from '@/shared/assets/icons/logo.svg?component';
 
 const props = defineProps({
     type: {
@@ -156,15 +158,13 @@ const submitForm = async () => {
     } else {
         await authFormStore.login();
     }
-    router.push({ name: Routes.HOME })
+    router.push({ name: Routes.HOME });
+    authFormStore.resetForm();
 };
 </script>
 <template>
     <Column :gap="'32'" full-width class="auth-form">
-        <!--Вместо иконки для вида-->
-        <Typography :weight="600" :align="'center'" :size="'xxl'">
-            ICON ilow
-        </Typography>
+        <Logo/>
         <Typography :weight="600" :align="'center'" :size="'xl'">
             {{ authContent.welcomeMsg }}
         </Typography>
@@ -249,7 +249,7 @@ const submitForm = async () => {
                 }}</Typography>
             </Column>
         </form>
-        <RouterLink :to="authContent.route" @click="authFormStore.resetForm">
+        <RouterLink :to="authContent.route" @click="authFormStore.resetForm()">
             <Typography :weight="500" :align="'center'" class="auth-link">
                 {{ authContent.linkText }}
             </Typography>

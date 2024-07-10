@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, PropType } from 'vue';
 
-type TagSize = 'md' | 'sm';
+type TagSize = 'md' | 'sm' | 'md-inverted';
 
 const props = defineProps({
     fullWidth: {
@@ -15,7 +15,8 @@ const props = defineProps({
 
 const tagSize: Record<TagSize, TagSize> = {
     md: 'md',
-    sm: 'sm'
+    sm: 'sm',
+    'md-inverted': 'md-inverted'
 }
 
 const classes = computed(() => ({

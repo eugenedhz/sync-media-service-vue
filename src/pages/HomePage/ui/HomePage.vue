@@ -9,16 +9,27 @@ import {
 } from '@/entities/User';
 import { __BASE_URL__ } from '@/shared/config/environment';
 import { MediaGrid } from '@/features/MediaGrid';
-import { fetchAllMedias, MediaWithGenres } from '@/entities/Media/api/requests';
+import { fetchAllMedias, MediaWithGenres, findMedias } from '@/entities/Media/api/requests';
 import { MediaSwiper } from '@/entities/Media';
 import { RoomCardList, useGetAllRoomsApi, Room } from '@/entities/Room';
 import { Column, Typography, Row } from '@/shared/ui';
 import { useRouter } from 'vue-router';
-import { getRouteRoom, Routes } from '@/shared/consts/router';
+import { Routes } from '@/shared/consts/router';
+import { useGetAllGenreApi } from '@/entities/Genre';
+
+
+import { SearchBar } from '@/widgets/SearchBar'
+
+const isOpen = ref(true)
+
+function setIsOpen(value: boolean) {
+    isOpen.value = value
+}
 
 const userStore = useUserStore();
 const friendsApi = useFriendsApi();
 const roomsApi = useGetAllRoomsApi();
+const genreApi = useGetAllGenreApi();
 const isFriendsIsLoading = ref<boolean>(false);
 
 const router = useRouter();
@@ -76,7 +87,7 @@ const navigateToProfile = (user: User) => {
 };
 
 onMounted(async () => {
-    await Promise.all([fetchMedias(), fetchFriends(), roomsApi.initiate()]);
+    await Promise.all([fetchMedias(), fetchFriends(), roomsApi.initiate(), genreApi.initiate()]);
 });
 </script>
 
@@ -84,7 +95,8 @@ onMounted(async () => {
     <template v-if="friendsApi?.data && roomsApi?.data && mediaRows">
         <div class="background">
             <Page>
-                <Column :align="'start'" :gap="'16'" class="padding">
+                <Column :align="'start'" :gap="'32'" class="padding">
+                    <SearchBar/>
                     <Row :align="'stretch'" :gap="'16'">
                         <UserLabelList
                             v-if="
@@ -98,9 +110,9 @@ onMounted(async () => {
                         <MediaSwiper :medias="mediaRows?.[0]" />
                     </Row>
                     <Column :gap="'16'" :align="'start'">
-                        <Typography :size="'xl'" :weight="600"
-                            >Rooms</Typography
-                        >
+                        <Typography :size="'xl'" :weight="600">
+                            Rooms
+                        </Typography>
                         <div class="ilow-scroll room-overflow">
                             <RoomCardList
                                 v-if="
@@ -126,7 +138,7 @@ onMounted(async () => {
 <style scoped lang="css">
 @import url('@/app/styles/scrollbar.css');
 .background {
-    background: linear-gradient(108deg, #ff7a00 0%, #b82020 100%) no-repeat;
+    background:  linear-gradient(135deg, #2296ef, #03228f);
 }
 
 .dark {
@@ -139,6 +151,7 @@ onMounted(async () => {
 }
 
 .padding {
-    padding: 32px;
+    padding: 16px 32px;
+    padding-top: 0;
 }
 </style>

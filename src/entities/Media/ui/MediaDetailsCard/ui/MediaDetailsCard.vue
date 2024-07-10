@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+import { PropType, ref } from 'vue';
 
 import {
     Column,
@@ -11,7 +11,11 @@ import {
 } from '@/shared/ui';
 import { __BASE_URL__ } from '@/shared/config/environment'
 import { Genre, Media } from '../../../api/requests';
+import Plus from '@/shared/assets/icons/plus.svg?component';
+import { useRoute } from 'vue-router'
+import { Routes } from '@/shared/consts/router';
 
+const route = useRoute()
 const props = defineProps({
     media: {
         type: Object as PropType<Media>,
@@ -22,6 +26,10 @@ const props = defineProps({
         default: [],
     }
 });
+
+const emit = defineEmits([
+    'iconClick'
+])
 </script>
 <template>
     <CardContainerWithImage full-width :image="media.preview" class="card-height">
@@ -42,12 +50,12 @@ const props = defineProps({
                         </Tag>
                     </template>
                 </Row>
-                    <Typography :weight="500" :color="'pale'" class="text-ellipsis">
-                        {{ media?.description }}
-                    </Typography>
+                <Typography :weight="500" :color="'pale'" class="text-ellipsis">
+                    {{ media?.description }}
+                </Typography>
             </Column>
             <Row>
-                <Typography :size="'sm'">ICONS</Typography>
+                <Plus v-if="route.name === Routes.ROOM" @click="emit('iconClick', media)" class="pointer" />
             </Row>
         </Row>
     </CardContainerWithImage>

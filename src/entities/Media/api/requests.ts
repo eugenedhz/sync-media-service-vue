@@ -44,3 +44,9 @@ export const fetchAllMedias = (params: { limit: number, offset: number }) => api
         ...params
     }
 });
+
+export const findMedias = (params: any) => api.get('/media/all', {
+    params: {
+        ...params
+    }
+});

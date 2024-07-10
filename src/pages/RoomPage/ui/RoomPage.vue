@@ -1,15 +1,29 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, Ref, ref, nextTick, watch } from 'vue';
+import { onMounted, onActivated, onBeforeUnmount, onBeforeMount, onDeactivated, Ref, ref, nextTick, watch, computed } from 'vue'; 
 import { socketService } from '@/shared/api';
 import { useRoute } from 'vue-router';
 import { useUserStore } from '@/entities/User';
-import { PlaylistMedia, useGetAllPlaylistMediaApi } from '@/entities/Media';
+import {
+    PlaylistMedia,
+    useGetAllPlaylistMediaApi,
+    Media
+} from '@/entities/Media';
 import { useGetAllVideoMediaApi } from '@/entities/Video';
 import { __BASE_URL__ } from '@/shared/config/environment';
 import { Page } from '@/widgets/Page';
 import { VideoPlayer } from '@/entities/Video';
-import { Input, Card, Typography, Avatar, Row, Column, Image } from '@/shared/ui';
+import {
+    Input,
+    Card,
+    Typography,
+    Avatar,
+    Row,
+    Column,
+    Image
+} from '@/shared/ui';
 import { Participant } from '@/entities/Participant';
+import { SearchBar } from '@/widgets/SearchBar';
+import { debounce } from '@/shared/lib/helpers/debounce';
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -28,13 +42,15 @@ const currentVideo = ref<PlaylistMedia>();
 
 const socket = socketService.socket;
 
-const roomId = Number(route.params?.id);
-
 socket.on('joined', (participatn) => {
     if (userStore.authData?.id === participatn.userId) {
-        socket.emit('requestPlayerState', { roomId });
+        socket.emit('requestPlayerState', { roomId: Number(route.params.id) });
     }
 });
+
+socket.on('left', () => {
+    console.log('left')
+})
 
 socket.on('sendPlayerStateFromClient', ({ userSID }) => {
     console.log('sendPlayerStateFromClient', userSID);
@@ -49,14 +65,13 @@ socket.on('sendPlayerStateFromClient', ({ userSID }) => {
 socket.on('error', (e) => console.log(e));
 
 socket.on('syncPlayerState', ({ currentTime, isPaused }) => {
-    console.log(currentTime);
-    console.log('syncPlayerState');
-    rootRef.value.video.currentTime = currentTime;
-
-    if (isPaused) {
-        rootRef.value.video.pause();
-    } else {
-        rootRef.value.video.play();
+    if (rootRef.value) {
+        rootRef.value.video.currentTime = currentTime;
+        if (isPaused) {
+            rootRef.value.video.pause();
+        } else {
+            rootRef.value.video.play();
+        }
     }
 });
 
@@ -64,7 +79,6 @@ const playlistMediaApi = useGetAllPlaylistMediaApi();
 const videoMediaApi = useGetAllVideoMediaApi();
 
 const draw = () => {
-    console.log('darw');
     ctx.value.drawImage(
         rootRef.value.video,
         0,
@@ -85,7 +99,6 @@ const drawPause = () => {
 };
 
 const init = () => {
-    console.log('init');
     ctx.value = canvas.value?.getContext('2d');
     ctx.value.filter = 'blur(1px)';
 
@@ -97,19 +110,24 @@ const init = () => {
 };
 
 const cleanup = () => {
-    rootRef.value.video.removeEventListener('loadeddata', draw);
-    rootRef.value.video.removeEventListener('seeked', draw);
-    rootRef.value.video.removeEventListener('play', drawLoop);
-    rootRef.value.video.removeEventListener('pause', drawPause);
-    rootRef.value.video.removeEventListener('ended', drawPause);
+    if (rootRef.value) {
+        rootRef.value.video.removeEventListener('loadeddata', draw);
+        rootRef.value.video.removeEventListener('seeked', draw);
+        rootRef.value.video.removeEventListener('play', drawLoop);
+        rootRef.value.video.removeEventListener('pause', drawPause);
+        rootRef.value.video.removeEventListener('ended', drawPause);
+    }
 };
 
+
+
 onMounted(async () => {
-    socket.emit('join', { roomId });
+    
+    socket.emit('join', { roomId: Number(route.params.id) });
 
     await playlistMediaApi.initiate(undefined, {
         params: {
-            filter_by: `roomId{==}${roomId}`
+            filter_by: `roomId{==}${route.params.id}`
         }
     });
 
@@ -127,11 +145,20 @@ onMounted(async () => {
     }
 });
 
-onUnmounted(() => {
-    socket.emit('leave', { roomId }).disconnect();
+
+
+onBeforeUnmount(() => {
+    socket.off('joined');
+    socket.off('playlistMediaSettedToPlayer');
+    socket.off('error');
+    socket.off('sendPlayerStateFromClient');
+    socket.off('playlistMediaAdded');
+    socket.off('messageSent');
+    socket.off('syncPlayerState')
+    socket.off('left')
+    if (route.params?.id) socket.emit('leave', { roomId: Number(route.params.id) })
     cleanup();
 });
-
 
 const playerInit = (videoRef: HTMLElement) => {
     console.log(videoRef);
@@ -146,7 +173,7 @@ const timeUpdate = ({
 }) => {
     socket.emit('sendPlayerStateToEveryone', {
         currentTime,
-        roomId,
+        roomId: Number(route.params.id),
         isPaused
     });
     console.log('sendPlayerStateToEveryone');
@@ -161,14 +188,13 @@ const playToggle = ({
 }) => {
     socket.emit('sendPlayerStateToEveryone', {
         currentTime,
-        roomId,
+        roomId: Number(route.params.id),
         isPaused
     });
     console.log('sendPlayerStateToEveryone');
 };
 
 const setPlayListMediaToPlayer = (playlistMediaId: number) => {
-    console.log(playlistMediaId, 'playlistMediaId');
     socket.emit('setPlaylistMediaToPlayer', { playlistMediaId });
 };
 
@@ -181,25 +207,25 @@ socket.on('playlistMediaSettedToPlayer', async (playlistMedia) => {
     currentVideo.value = videoMediaApi.data?.[0].source;
     await playlistMediaApi.initiate(undefined, {
         params: {
-            filter_by: `roomId{==}${roomId}`
+            filter_by: `roomId{==}${route.params.id}`
         }
     });
-    rootRef.value.video.pause();
-    rootRef.value.video.currentTime = 0;
+
+        rootRef.value.video.pause();
+        rootRef.value.video.currentTime = 0;
+
 });
 
 const submit = (e: Event) => {
     e.preventDefault();
     socket.emit('sendMessage', {
-        roomId,
+        roomId: Number(route.params.id),
         message: message.value
     });
-    console.log('sendMessage');
     message.value = '';
 };
 
 socket.on('messageSent', async (msg) => {
-    console.log('messageSent');
     messages.value.push(msg);
     await nextTick();
 
@@ -209,6 +235,22 @@ socket.on('messageSent', async (msg) => {
         }
     });
 });
+
+socket.on('playlistMediaAdded', () => {
+    playlistMediaApi.initiate(undefined, {
+        params: {
+            filter_by: `roomId{==}${route.params.id}`
+        }
+    });
+});
+
+const addPlaylistMedia = (media: Media) => {
+    socket.emit('addPlaylistMedia', { roomId: Number(route.params.id), mediaId: media.id });
+};
+const onLeave = () => {
+    socket.emit('leave', { roomId: Number(route.params.id) })
+}
+
 </script>
 
 <template>
@@ -216,11 +258,8 @@ socket.on('messageSent', async (msg) => {
         <section class="wrapper">
             <Page>
                 <Column :gap="'32'">
-                  <Row full-width class="padding">
-                        <Input full-width />
-                    </Row>
+                    <SearchBar @add-media="addPlaylistMedia($event)" @leave="onLeave()"/>
                     <Column full-width :gap="'16'">
-                        
                         <div>
                             <VideoPlayer
                                 ref="rootRef"
@@ -229,48 +268,88 @@ socket.on('messageSent', async (msg) => {
                                 @time-update="timeUpdate($event)"
                                 @play-toggle="playToggle($event)"
                                 :src="
-                                    __BASE_URL__ + currentVideo + '?quality=1080p'
+                                    __BASE_URL__ +
+                                    currentVideo +
+                                    '?quality=1080p'
                                 "
                             >
                             </VideoPlayer>
                         </div>
-    
+
                         <Column full-width>
-                            <Row :gap="'16'" :align="'stretch'" style="max-height: 500px;" full-width>
-                                <Card :material="'qwartz-primary'" style="flex: 2; ">
+                            <Row :gap="'16'" :align="'stretch'" full-width>
+                                <Card
+                                    :material="'qwartz-primary'"
+                                    style="flex: 2"
+                                >
                                     <template #header>
                                         <Row full-width>
-                                            <Typography :weight="600" :size="'lg'">
+                                            <Typography
+                                                :weight="600"
+                                                :size="'lg'"
+                                            >
                                                 Playlist
                                             </Typography>
                                         </Row>
                                     </template>
-                                    <Column :align="'stretch'" :gap="'8'" style="overflow-y: auto;">
-                                      <template
-                                          v-for="playlistMedia in playlistMediaApi?.data"
-                                      >
-  
-                                          <Card :padding="'none'">
-                                            <Row
-                                              full-width 
-                                              :gap="'16'"                                    
-                                              class="pointer"
-                                              @click="
-                                                  setPlayListMediaToPlayer(
-                                                      playlistMedia.id
-                                                  )
-                                              ">
-                                            <Image :width="153" :height="73" style="object-fit: cover;" :src="playlistMedia.thumbnail"/>
-                                            <Typography :weight="600">{{ playlistMedia.name }} </Typography>
-                                          </Row>
-                                          </Card>
-                                      </template>
+                                    <Column full-width :align="'stretch'">
+                                        <div
+                                            style="
+                                                overflow-y: auto;
+                                                height: 400px;
+                                            "
+                                        >
+                                            <Column
+                                                :align="'stretch'"
+                                                :gap="'8'"
+                                            >
+                                                <template
+                                                    v-for="playlistMedia in playlistMediaApi?.data"
+                                                >
+                                                    <Card :padding="'none'">
+                                                        <Row
+                                                            full-width
+                                                            :gap="'16'"
+                                                            class="pointer"
+                                                            @click="
+                                                                setPlayListMediaToPlayer(
+                                                                    playlistMedia.id
+                                                                )
+                                                            "
+                                                        >
+                                                            <Image
+                                                                :width="153"
+                                                                :height="73"
+                                                                style="
+                                                                    object-fit: cover;
+                                                                "
+                                                                :src="
+                                                                    playlistMedia.thumbnail
+                                                                "
+                                                            />
+                                                            <Typography
+                                                                :weight="600"
+                                                                >{{
+                                                                    playlistMedia.name
+                                                                }}
+                                                            </Typography>
+                                                        </Row>
+                                                    </Card>
+                                                </template>
+                                            </Column>
+                                        </div>
                                     </Column>
                                 </Card>
-                                <Card :material="'qwartz-primary'" style="flex: 1">
+                                <Card
+                                    :material="'qwartz-primary'"
+                                    style="flex: 1"
+                                >
                                     <template #header>
                                         <Row full-width>
-                                            <Typography :weight="600" :size="'lg'">
+                                            <Typography
+                                                :weight="600"
+                                                :size="'lg'"
+                                            >
                                                 Chat
                                             </Typography>
                                         </Row>
@@ -300,7 +379,8 @@ socket.on('messageSent', async (msg) => {
                                                         :justify="
                                                             message.participant
                                                                 .userId ===
-                                                            userStore.authData.id
+                                                            userStore.authData
+                                                                .id
                                                                 ? 'end'
                                                                 : 'start'
                                                         "
@@ -312,7 +392,8 @@ socket.on('messageSent', async (msg) => {
                                                                         .participant
                                                                         .userId ===
                                                                     userStore
-                                                                        .authData.id
+                                                                        .authData
+                                                                        .id
                                                                 )
                                                             "
                                                         >
@@ -328,10 +409,11 @@ socket.on('messageSent', async (msg) => {
                                                         <Card
                                                             :padding="'sm'"
                                                             :material="
-                                                                message.participant
+                                                                message
+                                                                    .participant
                                                                     .userId ===
-                                                                userStore.authData
-                                                                    .id
+                                                                userStore
+                                                                    .authData.id
                                                                     ? 'qwartz-inverted'
                                                                     : 'qwartz-secondary'
                                                             "
@@ -350,7 +432,8 @@ socket.on('messageSent', async (msg) => {
                                                                         .participant
                                                                         .userId ===
                                                                     userStore
-                                                                        .authData.id
+                                                                        .authData
+                                                                        .id
                                                                         ? 'inverted'
                                                                         : 'primary'
                                                                 "
@@ -361,10 +444,11 @@ socket.on('messageSent', async (msg) => {
                                                         </Card>
                                                         <template
                                                             v-if="
-                                                                message.participant
+                                                                message
+                                                                    .participant
                                                                     .userId ===
-                                                                userStore.authData
-                                                                    .id
+                                                                userStore
+                                                                    .authData.id
                                                             "
                                                         >
                                                             <Avatar
