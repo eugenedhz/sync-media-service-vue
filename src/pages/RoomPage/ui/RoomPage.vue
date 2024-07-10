@@ -299,6 +299,7 @@ const onLeave = () => {
                                                 overflow-y: auto;
                                                 height: 400px;
                                             "
+                                            class="ilow-scroll"
                                         >
                                             <Column
                                                 :align="'stretch'"

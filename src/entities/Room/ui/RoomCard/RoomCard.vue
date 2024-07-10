@@ -35,6 +35,7 @@ img {
     height: 100%;
     width: 100%;
     object-fit: cover;
+    filter: brightness(0.6);
 }
 .centered {
     white-space: nowrap;
