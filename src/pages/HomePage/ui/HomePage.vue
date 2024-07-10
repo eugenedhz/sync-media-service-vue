@@ -104,7 +104,7 @@ onMounted(async () => {
                             "
                             @user-click="navigateToProfile($event)"
                             class="ilow-scroll"
-                            :users="friendsApi?.data || []"
+                            :users="friendsApi.data"
                             :is-loading="isFriendsIsLoading"
                         />
                         <MediaSwiper :medias="mediaRows?.[0]" />

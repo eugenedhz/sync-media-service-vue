@@ -1,4 +1,4 @@
-interface VideoMedia {
+export interface VideoMedia {
     id: number;
     language: string;
     mediaId: number;

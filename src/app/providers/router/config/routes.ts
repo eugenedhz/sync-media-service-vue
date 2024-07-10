@@ -5,7 +5,6 @@ import { LogInPage } from '@/pages/LogInPage';
 import { SignUpPage } from '@/pages/SignUpPage';
 import { Routes, getRouteHome, getRouteLogIn, getRouteProfile, getRouteRoom, getRouteSignUp } from '@/shared/consts/router';
 import { RoomPage } from '@/pages/RoomPage';
-import { ProfilePage } from '@/pages/ProfilePage';
 
 export const routes: RouteRecordRaw[] = [
     {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, PropType } from 'vue'
 import { useRouter } from 'vue-router';
 import { Avatar, Dropdown } from '@/shared/ui';
 import { Routes } from '@/shared/consts/router';

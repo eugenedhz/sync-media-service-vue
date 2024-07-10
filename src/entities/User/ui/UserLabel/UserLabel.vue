@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { PropType } from 'vue';
-import { User } from '../../../model/types/user';
 import { Row, Card, Avatar, Typography } from '@/shared/ui';
 import { __BASE_URL__ } from '@/shared/config/environment'
+import { User } from '../../model/types/user';
 
 defineProps({
     user: {

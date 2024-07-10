@@ -19,7 +19,7 @@ export const useLogoutApi = buildApi<void>(logoutNamespace, {
     withCredentials: true
 });
 
-export const useFriendsApi = buildApi(getFriendsNamespace, {
+export const useFriendsApi = buildApi<User[]>(getFriendsNamespace, {
     url: '/friends',
     method: 'GET',
     withCredentials: true

@@ -147,7 +147,7 @@ const togglePlay = () => {
         setPlaying(true);
     }
 
-    emit('playToggle', { currentTime: video.value.currentTime, isPaused: video.value.paused });
+    emit('playToggle', { currentTime: video.value?.currentTime, isPaused: video.value?.paused });
 };
 
 const toggleFullScreenMode = () => {
@@ -276,6 +276,7 @@ const applyHotkeys = (e: KeyboardEvent) => {
     if (tagName === 'input') return;
 
     switch (e.key.toLowerCase()) {
+        // @ts-ignore
         case ' ':
             if (tagName === 'button') break;
         case 'k':

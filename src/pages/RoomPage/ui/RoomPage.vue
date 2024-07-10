@@ -27,7 +27,7 @@ import { debounce } from '@/shared/lib/helpers/debounce';
 
 const route = useRoute();
 const userStore = useUserStore();
-const rootRef = ref(null);
+const rootRef = ref<{ video: HTMLVideoElement } | null>(null);
 const step = ref<number>();
 const ctx = ref();
 const canvas = ref<HTMLCanvasElement | null>(null);
@@ -38,7 +38,7 @@ const message = ref('');
 const messages = ref<{ message: string; participant: Participant }[]>([]);
 
 const video = ref<HTMLElement | null>(null);
-const currentVideo = ref<PlaylistMedia>();
+const currentVideo = ref<string>('');
 
 const socket = socketService.socket;
 
@@ -56,8 +56,8 @@ socket.on('sendPlayerStateFromClient', ({ userSID }) => {
     console.log('sendPlayerStateFromClient', userSID);
     socket.emit('sendPlayerStateToUser', {
         userSID,
-        currentTime: rootRef.value.video.currentTime,
-        isPaused: rootRef.value.video.paused
+        currentTime: rootRef.value?.video.currentTime!,
+        isPaused: rootRef.value?.video.paused!
     });
     console.log('sendPlayerStateToUser');
 });
@@ -80,11 +80,11 @@ const videoMediaApi = useGetAllVideoMediaApi();
 
 const draw = () => {
     ctx.value.drawImage(
-        rootRef.value.video,
+        rootRef.value?.video,
         0,
         0,
-        canvas.value.width,
-        canvas.value.height
+        canvas.value?.width,
+        canvas.value?.height
     );
 };
 
@@ -94,7 +94,7 @@ const drawLoop = () => {
 };
 
 const drawPause = () => {
-    window.cancelAnimationFrame(step.value);
+    window.cancelAnimationFrame(step.value!);
     step.value = undefined;
 };
 
@@ -102,11 +102,11 @@ const init = () => {
     ctx.value = canvas.value?.getContext('2d');
     ctx.value.filter = 'blur(1px)';
 
-    rootRef.value.video.addEventListener('loadeddata', draw, false);
-    rootRef.value.video.addEventListener('seeked', draw, false);
-    rootRef.value.video.addEventListener('play', drawLoop, false);
-    rootRef.value.video.addEventListener('pause', drawPause, false);
-    rootRef.value.video.addEventListener('ended', drawPause, false);
+    rootRef.value?.video.addEventListener('loadeddata', draw, false);
+    rootRef.value?.video.addEventListener('seeked', draw, false);
+    rootRef.value?.video.addEventListener('play', drawLoop, false);
+    rootRef.value?.video.addEventListener('pause', drawPause, false);
+    rootRef.value?.video.addEventListener('ended', drawPause, false);
 };
 
 const cleanup = () => {
@@ -137,7 +137,7 @@ onMounted(async () => {
             filter_by: `mediaId{==}${mediaId}`
         }
     });
-    currentVideo.value = videoMediaApi.data?.[0].source;
+    currentVideo.value = videoMediaApi.data?.[0].source!;
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     if (!mediaQuery.matches) {
@@ -204,16 +204,17 @@ socket.on('playlistMediaSettedToPlayer', async (playlistMedia) => {
             filter_by: `mediaId{==}${playlistMedia.mediaId}`
         }
     });
-    currentVideo.value = videoMediaApi.data?.[0].source;
+    currentVideo.value = videoMediaApi.data?.[0].source!;
     await playlistMediaApi.initiate(undefined, {
         params: {
             filter_by: `roomId{==}${route.params.id}`
         }
     });
 
+    if (rootRef.value) {
         rootRef.value.video.pause();
         rootRef.value.video.currentTime = 0;
-
+    }
 });
 
 const submit = (e: Event) => {
@@ -379,7 +380,7 @@ const onLeave = () => {
                                                         :justify="
                                                             message.participant
                                                                 .userId ===
-                                                            userStore.authData
+                                                            userStore!.authData!
                                                                 .id
                                                                 ? 'end'
                                                                 : 'start'
@@ -391,8 +392,8 @@ const onLeave = () => {
                                                                     message
                                                                         .participant
                                                                         .userId ===
-                                                                    userStore
-                                                                        .authData
+                                                                    userStore!
+                                                                        .authData!
                                                                         .id
                                                                 )
                                                             "
@@ -412,9 +413,9 @@ const onLeave = () => {
                                                                 message
                                                                     .participant
                                                                     .userId ===
-                                                                userStore
-                                                                    .authData.id
-                                                                    ? 'qwartz-inverted'
+                                                                userStore!
+                                                                    .authData!.id
+                                                                    ? 'qwarz-inverted'
                                                                     : 'qwartz-secondary'
                                                             "
                                                             style="
@@ -431,8 +432,8 @@ const onLeave = () => {
                                                                     message
                                                                         .participant
                                                                         .userId ===
-                                                                    userStore
-                                                                        .authData
+                                                                    userStore!
+                                                                        .authData!
                                                                         .id
                                                                         ? 'inverted'
                                                                         : 'primary'
@@ -447,8 +448,8 @@ const onLeave = () => {
                                                                 message
                                                                     .participant
                                                                     .userId ===
-                                                                userStore
-                                                                    .authData.id
+                                                                userStore!
+                                                                    .authData!.id
                                                             "
                                                         >
                                                             <Avatar
