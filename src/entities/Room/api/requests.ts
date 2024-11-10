@@ -6,3 +6,18 @@ export const useGetAllRoomsApi = buildApi<Room[], void>('getAllRooms', {
     method: 'GET',
     withCredentials: true,
 });
+
+export interface CreateRoomArgs {
+    title: string;
+}
+
+export const useCreateRoomApi = buildApi<Room, CreateRoomArgs>('createRoom', {
+    url: '/room',
+    method: 'POST',
+    withCredentials: true
+});
+
+export const useGetRoomApi = buildApi<Room, void>('getRoom', {
+    url: '/room',
+    method: 'GET'
+});

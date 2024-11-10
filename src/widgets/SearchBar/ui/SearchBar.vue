@@ -13,9 +13,11 @@ import {
 } from '@/entities/Media/api/requests';
 import { MediaSwiper } from '@/entities/Media';
 import { RoomCardList, useGetAllRoomsApi, Room } from '@/entities/Room';
-import { Column, Typography, Row, Input, Card, Tag } from '@/shared/ui';
+import { Column, Typography, Row, Input, Card, Tag, Button } from '@/shared/ui';
 import { MediaGrid } from '@/features/MediaGrid';
-import { RouterLink, useRouter } from 'vue-router';
+import { CreateRoomForm } from '@/features/CreateRoomForm'
+import { RouterLink, useRouter, useRoute } from 'vue-router';
+import Add from '@/shared/assets/icons/add.svg?component'
 
 import {
     TransitionRoot,
@@ -27,7 +29,8 @@ import {
 } from '@headlessui/vue';
 
 
-const router = useRouter()
+const router = useRouter();
+const route = useRoute(); 
 const isOpen = ref(false);
 
 function setIsOpen(value: boolean) {
@@ -103,21 +106,110 @@ const navigateToHome = () => {
     emit('leave')
     router.push({ name: 'home' });
 }
+
+const isRoomFormOpen = ref(false);
+
+const roomFormOpen = (value: boolean) => {
+    isRoomFormOpen.value = value; 
+}
+
 </script>
 
 <template>
+    <TransitionRoot appear :show="isRoomFormOpen" as="template">
+        <Dialog
+            as="div"
+            @close="roomFormOpen(false)"
+            class="relative z-10"
+            style="position: relative; z-index: 10"
+        >
+            <TransitionChild
+                as="template"
+                enter="duration-300 ease-out"
+                enter-from="opacity-0"
+                enter-to="opacity-100"
+                leave="duration-200 ease-in"
+                leave-from="opacity-100"
+                leave-to="opacity-0"
+            >
+                <div
+                    class="fixed inset-0 bg-black/25"
+                    style="
+                        position: fixed;
+                        background: rgba(0, 0, 0, 0.45);
+                        inset: 0;
+                    "
+                />
+            </TransitionChild>
+            <div
+                class="fixed inset-0 overflow-y-auto"
+                style="position: fixed; inset: 0; overflow-x: auto; top: 25%"
+            >
+                <div
+                    class="flex min-h-full items-center justify-center p-4 text-center"
+                    style="
+                        display: flex;
+                        justify-items: center;
+                        flex-direction: column;
+                        align-items: center;
+                        text-align: start;
+                        justify-content: start;
+                    "
+                >
+                    <TransitionChild
+                        as="template"
+                        enter="duration-300 ease-out"
+                        enter-from="opacity-0 scale-95"
+                        enter-to="opacity-100 scale-100"
+                        leave="duration-200 ease-in"
+                        leave-from="opacity-100 scale-100"
+                        leave-to="opacity-0 scale-95"
+                    >
+                        <DialogPanel
+                            class="max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
+                            style="
+                                width: 100%;
+                                height: 100%;
+                                max-width: 300px;
+                                max-height: 500px;
+                                padding-top: 30px;
+                                overflow: hidden;
+                                transition: all;
+                                vertical-align: middle;
+                            "
+                        >
+                            <CreateRoomForm></CreateRoomForm>
+                        </DialogPanel>
+                    </TransitionChild>
+                </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
+
     <Row :gap="'16'" full-width>
         <div @click="navigateToHome()">
             <Logo />
         </div>
         <Input
             @click="setIsOpen(true)"
-            placeholder="Search..."
+            placeholder="Поиск..."
             icon-shown
             full-width
         >
             <Search />
         </Input>
+        <template v-if="(route.name === 'home')">
+            <Button
+                :variant="'blured'"
+                @click="roomFormOpen(true)"
+                style="width: 226px;"
+            >
+                <Typography
+                    :size="'sm'"
+                    :weight="400"
+                >новая комната</Typography>
+            </Button>
+        </template>
         <AvatarDropdown />
     </Row>
     <TransitionRoot appear :show="isOpen" as="template">
@@ -140,7 +232,7 @@ const navigateToHome = () => {
                     class="fixed inset-0 bg-black/25"
                     style="
                         position: fixed;
-                        background: rgba(0, 0, 0, 0.25);
+                        background: rgba(0, 0, 0, 0.45);
                         inset: 0;
                     "
                 />
@@ -188,7 +280,7 @@ const navigateToHome = () => {
                                         v-model="searchQuery"
                                         @input="onInput"
                                         @click="setIsOpen(true)"
-                                        placeholder="Search..."
+                                        placeholder="Поиск..."
                                         icon-shown
                                         full-width
                                     >

@@ -1,0 +1,3 @@
+bun run build
+sudo rm -rf /var/www/ilow/dist
+sudo mv dist/ /var/www/ilow/

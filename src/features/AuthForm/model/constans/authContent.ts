@@ -1,15 +1,15 @@
 export const signupContent = {
-    welcomeMsg: 'Welcome!',
-    buttonText: 'SIGN UP',
-    linkText: 'Already have an account?',
+    welcomeMsg: 'Добро пожаловать!',
+    buttonText: 'создать аккаунт',
+    linkText: 'Уже есть аккаунт?',
     authType: 'signup',
     route: '/login'
 };
 
 export const loginContent = {
-    welcomeMsg: 'Welcome Back!',
-    buttonText: 'SIGN IN',
-    linkText: 'New here?',
+    welcomeMsg: 'Добро пожаловать снова!',
+    buttonText: 'войти',
+    linkText: 'Нет аккаунта?',
     authType: 'login',
     route: '/signup'
 };

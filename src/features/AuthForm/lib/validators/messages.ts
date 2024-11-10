@@ -1,23 +1,23 @@
 export const authValidationMessages = {
     USERNAME_ALREADY_EXISTS:
-        'Username already exists, please choose another username.',
-    EMAIL_ALREADY_EXISTS: 'Email already exists, please login.',
-    USERNAME_NOT_FOUND: 'User not found, please register.',
-    INCORRECT_PASSWORD: 'Incorrect password.',
-    USER_IS_BANNED: 'User is banned.',
-    PASSWORDS_NOT_MATCH: 'Passwords don`t match.',
+        'Логин существует, пожалуйста, попробуйте другой.',
+    EMAIL_ALREADY_EXISTS: 'Почта существует, пожалуйста, попробуйте другую.',
+    USERNAME_NOT_FOUND: 'Логин не найден, пожалуйста, попробуйте другой или создайте аккаунт.',
+    INCORRECT_PASSWORD: 'Неправильный пароль.',
+    USER_IS_BANNED: 'Пользователь заблокирован.',
+    PASSWORDS_NOT_MATCH: 'Пароли не совпадают.',
     INVALID_LENGTH: {
         USERNAME:
-            'Login length is invalid. Length of login is from 5 to 30 symbols.',
+            'Неправильная длина логина. Длина от 5 до 30 символов.',
         DISPLAY_NAME:
-            'Name length is invalid. Length of name is from 1 to 30 symbols.',
+            'Неправильная длина имени. Длина от 1 до 30 символов.',
         PASSWORD:
-            'Password length is invalid. Length of password is minimum 8 symbols.'
+            'Длина пароля недостаточна. Минимум 8 символов.'
     },
     REGEXP_MISMATCH: {
         USERNAME:
-            "Login format is invalid. Login can only consist of Latin letters, numbers and symbols: '.', '_', '-'",
+            "Неправильный формат логина. Может состоять только из латинских букв, цифр и символов: '.', '_', '-'",
         PASSWORD:
-            "Password format is invalid. Password can only consist of Latin letters, numbers and symbols: '.', '@', '_', '-'"
+            "Неправильный формат пароля. Может состоять только из латинских букв, цифр и символов: '.', '@', '_', '-'"
     }
 };

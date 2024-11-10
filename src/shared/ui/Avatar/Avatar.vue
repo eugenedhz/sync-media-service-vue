@@ -1,5 +1,8 @@
 <script setup lang="ts">
-defineProps({
+import { computed } from 'vue';
+import DefaultAvatar from '@/shared/assets/img/default_avatar.png';
+
+const props = defineProps({
     width: {
         type: String,
         default: '55px'
@@ -7,12 +10,22 @@ defineProps({
     height: {
         type: String,
         default: '55px'
+    },
+    src: {
+        type: String,
+        default: ''
     }
 });
+
+const imageSrc = computed(() => {
+    const finalSrc = props.src?.endsWith("null") ? null : props.src;
+    return finalSrc || DefaultAvatar;
+});
+
 </script>
 
 <template>
-    <img :width="width" :height="height"/>
+    <img :width="props.width" :height="props.height" :src="imageSrc" />
 </template>
 
 

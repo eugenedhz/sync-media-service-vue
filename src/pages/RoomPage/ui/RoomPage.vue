@@ -8,6 +8,8 @@ import {
     useGetAllPlaylistMediaApi,
     Media
 } from '@/entities/Media';
+import { useGetAllParticipantsApi } from '@/entities/Participant';
+import { useGetRoomApi } from '@/entities/Room';
 import { useGetAllVideoMediaApi } from '@/entities/Video';
 import { __BASE_URL__ } from '@/shared/config/environment';
 import { Page } from '@/widgets/Page';
@@ -36,20 +38,33 @@ const chatWindow = ref<HTMLElement | null>(null);
 
 const message = ref('');
 const messages = ref<{ message: string; participant: Participant }[]>([]);
+const participants = ref<{ participant: Participant; additional: string }[]>([]);
 
 const video = ref<HTMLElement | null>(null);
 const currentVideo = ref<string>('');
 
 const socket = socketService.socket;
+const getRoomApi = useGetRoomApi();
 
-socket.on('joined', (participatn) => {
-    if (userStore.authData?.id === participatn.userId) {
+socket.on('joined', (participant) => {
+    if (userStore.authData?.id === participant.userId) {
         socket.emit('requestPlayerState', { roomId: Number(route.params.id) });
+        participants.value.push({ participant: participant, additional: '(вы)'});
+    } else {
+        let add = '';
+        if (getRoomApi.data?.creatorId === participant.userId){
+            add = '(создатель)'
+        }
+        participants.value.push({ participant: participant, additional: add});
     }
 });
 
-socket.on('left', () => {
-    console.log('left')
+socket.on('left', (participant) => {
+    participants.value.forEach((item, index) => {
+        if (item.participant.id === participant.id) {
+            participants.value.splice(index, 1);
+        }
+    });
 })
 
 socket.on('sendPlayerStateFromClient', ({ userSID }) => {
@@ -77,6 +92,7 @@ socket.on('syncPlayerState', ({ currentTime, isPaused }) => {
 
 const playlistMediaApi = useGetAllPlaylistMediaApi();
 const videoMediaApi = useGetAllVideoMediaApi();
+const participantsApi = useGetAllParticipantsApi();
 
 const draw = () => {
     ctx.value.drawImage(
@@ -119,11 +135,39 @@ const cleanup = () => {
     }
 };
 
+function truncate(text: string, length: number) {
+    if (text.length > length) {
+        return text.substring(0, length) + '...';
+    }
+    return text;
+}
 
 
 onMounted(async () => {
     
     socket.emit('join', { roomId: Number(route.params.id) });
+
+    await getRoomApi.initiate(undefined, {
+        params: {
+            id: `${route.params.id}`
+        }
+    }); 
+
+    await participantsApi.initiate(undefined, {
+        params: {
+            filter_by: `roomId{==}${route.params.id}`
+        }
+    });
+
+    participantsApi.data?.forEach(participant => {
+        if (participant.userId !== userStore.authData?.id) {
+            let add = '';
+            if (getRoomApi.data?.creatorId === participant.userId){
+                add = '(создатель)'
+            }
+            participants.value.push({ participant: participant, additional: add });
+        }
+    });;
 
     await playlistMediaApi.initiate(undefined, {
         params: {
@@ -276,9 +320,74 @@ const onLeave = () => {
                             >
                             </VideoPlayer>
                         </div>
-
                         <Column full-width>
                             <Row :gap="'16'" :align="'stretch'" full-width>
+                                <Card
+                                    :material="'qwartz-primary'"
+                                    style="flex: 1"
+                                    width="'30'"
+                                >
+                                    <template #header>
+                                        <Row full-width>
+                                            <Typography
+                                                :weight="600"
+                                                :size="'lg'"
+                                            >
+                                                Участники
+                                            </Typography>
+                                        </Row>
+                                    </template>
+                                    <Column
+                                        full-width :align="'stretch'"
+                                    >
+                                        <div
+                                            style="
+                                                overflow-y: auto;
+                                                height: 400px;
+                                            "
+                                            class="ilow-scroll"
+                                        >
+                                            <Column
+                                                :align="'stretch'"
+                                                :gap="'8'"
+                                            >
+                                                <template
+                                                    v-for="participant in participants"
+                                                >
+                                                    <Card :padding="'none'">
+                                                        <Row full-width :gap="'16'">
+                                                            <div>
+                                                                <Avatar
+                                                                    :width="'73'"
+                                                                    :height="'73'"
+                                                                    :src="
+                                                                        __BASE_URL__ +
+                                                                        participant
+                                                                            .participant
+                                                                            .avatar
+                                                                    "
+                                                                />
+                                                            </div>
+                                                            <Row full-width>
+                                                            <Typography
+                                                                :weight="600"
+                                                            >
+                                                                {{ participant.participant.name }}
+                                                            </Typography>
+                                                            <Typography
+                                                                :weight="400"
+                                                                :color="'green'"
+                                                            >
+                                                                {{ participant.additional }}
+                                                            </Typography>
+                                                            </Row>
+                                                        </Row>
+                                                    </Card>
+                                                </template>
+                                            </Column>
+                                        </div>
+                                    </Column>
+                                </Card>
                                 <Card
                                     :material="'qwartz-primary'"
                                     style="flex: 2"
@@ -289,7 +398,7 @@ const onLeave = () => {
                                                 :weight="600"
                                                 :size="'lg'"
                                             >
-                                                Playlist
+                                                Плейлист
                                             </Typography>
                                         </Row>
                                     </template>
@@ -352,7 +461,7 @@ const onLeave = () => {
                                                 :weight="600"
                                                 :size="'lg'"
                                             >
-                                                Chat
+                                                Чат
                                             </Typography>
                                         </Row>
                                     </template>
@@ -400,14 +509,29 @@ const onLeave = () => {
                                                                 )
                                                             "
                                                         >
-                                                            <Avatar
-                                                                :src="
-                                                                    __BASE_URL__ +
-                                                                    message
-                                                                        .participant
-                                                                        .avatar
-                                                                "
-                                                            />
+                                                            <Column>
+                                                                <div>
+                                                                    <Avatar
+                                                                        :src="
+                                                                            __BASE_URL__ +
+                                                                            message
+                                                                                .participant
+                                                                                .avatar
+                                                                        "
+                                                                    />
+                                                                </div>
+                                                                <Typography
+                                                                    :weight="400"
+                                                                    :size="'sm'"
+                                                                    :color="'pale'"
+                                                                >
+                                                                    {{ truncate(message
+                                                                            .participant
+                                                                            .name, 5
+                                                                        )
+                                                                    }}
+                                                                </Typography>
+                                                            </Column>
                                                         </template>
                                                         <Card
                                                             :padding="'sm'"
@@ -471,7 +595,7 @@ const onLeave = () => {
                                     <template #footer>
                                         <form @submit="submit">
                                             <Input
-                                                :placeholder="'Message..'"
+                                                :placeholder="'Сообщение..'"
                                                 v-model="message"
                                                 full-width
                                             />

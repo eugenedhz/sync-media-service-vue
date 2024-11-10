@@ -15,6 +15,14 @@
     color:  var(--qwarz-dark-primary);
 }
 
+.green {
+    color: green;
+}
+
+.red {
+    color: red;
+}
+
 .typographyle {
     color: rgb(var(--qwarz-light-primary-value) / 30%)
 }

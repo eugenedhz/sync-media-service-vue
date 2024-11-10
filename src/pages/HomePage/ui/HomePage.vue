@@ -111,7 +111,7 @@ onMounted(async () => {
                     </Row>
                     <Column :gap="'16'" :align="'start'">
                         <Typography :size="'xl'" :weight="600">
-                            Rooms
+                            Комнаты
                         </Typography>
                         <div class="ilow-scroll room-overflow">
                             <RoomCardList
@@ -129,7 +129,7 @@ onMounted(async () => {
         </div>
         <div class="dark">
             <Page>
-                <MediaGrid :media-rows="mediaRows"> Hot </MediaGrid>
+                <MediaGrid :media-rows="mediaRows"> Популярное </MediaGrid>
             </Page>
         </div>
     </template>

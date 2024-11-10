@@ -159,9 +159,11 @@ const submitForm = async () => {
     } else {
         await authFormStore.login();
     }
-    router.push({ name: Routes.HOME });
-    authFormStore.resetForm();
-    socketService.setup();
+    if (!authFormStore.error) {
+        authFormStore.resetForm();
+        router.push({ name: Routes.HOME });
+        socketService.setup();
+    }
 };
 </script>
 <template>
@@ -176,7 +178,7 @@ const submitForm = async () => {
                     <Row :gap="'16'" full-width :justify="'between'">
                         <Input
                             v-model="authFormStore.username"
-                            :placeholder="'Login'"
+                            :placeholder="'Логин'"
                             full-width
                             @blur="onBlur('username')"
                             @focus="onFocus('username')"
@@ -185,7 +187,7 @@ const submitForm = async () => {
                         <template v-if="authType === 'signup'">
                             <Input
                                 v-model="authFormStore.displayName"
-                                :placeholder="'Name'"
+                                :placeholder="'Имя'"
                                 full-width
                                 @blur="onBlur('displayName')"
                                 @focus="onFocus('displayName')"
@@ -203,7 +205,7 @@ const submitForm = async () => {
                     </template>
                     <Input
                         v-model="authFormStore.password"
-                        :placeholder="'Password'"
+                        :placeholder="'Пароль'"
                         :type="isPasswordVisible ? 'text' : 'password'"
                         full-width
                         icon-shown
@@ -215,7 +217,7 @@ const submitForm = async () => {
                     <template v-if="authType === 'signup'">
                         <Input
                             v-model="authFormStore.repeatPassword"
-                            :placeholder="'Password'"
+                            :placeholder="'Пароль'"
                             :type="
                                 isRepeatPasswordVisible ? 'text' : 'password'
                             "
@@ -246,7 +248,7 @@ const submitForm = async () => {
                 >
                     {{ authContent.buttonText }}
                 </Button>
-                <Typography :size="'sm'" :align="'start'">{{
+                <Typography :size="'sm'" :align="'start'" :color="'red'">{{
                     authFormStore.error
                 }}</Typography>
             </Column>
