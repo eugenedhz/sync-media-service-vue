@@ -15,7 +15,7 @@ defineEmits([
 </script>
 
 <template>
-    <Row :gap="'16'">
+    <Row :gap="'16'" full-width>
         <template v-for="room in rooms" :key="room.id">
             <div @click="$emit('room-click', room)">
                 <RoomCard :room="room"/>

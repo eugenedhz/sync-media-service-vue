@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { onMounted, onActivated, onBeforeUnmount, onBeforeMount, onDeactivated, Ref, ref, nextTick, watch, computed } from 'vue'; 
 import { socketService } from '@/shared/api';
-import { useRoute } from 'vue-router';
-import { useUserStore } from '@/entities/User';
+import { useRoute, useRouter } from 'vue-router';
+import { Routes } from '@/shared/consts/router';
+import { useUserStore, useGetUserApi } from '@/entities/User';
 import {
     PlaylistMedia,
     useGetAllPlaylistMediaApi,
@@ -43,8 +44,19 @@ const participants = ref<{ participant: Participant; additional: string }[]>([])
 const video = ref<HTMLElement | null>(null);
 const currentVideo = ref<string>('');
 
-const socket = socketService.socket;
 const getRoomApi = useGetRoomApi();
+const getUserApi = useGetUserApi();
+
+socketService.setup();
+const socket = socketService.socket;
+
+socket.on('connect', () => {
+    console.log('connected')
+});
+
+socket.on('disconnect', () => {
+    window.close()
+});
 
 socket.on('joined', (participant) => {
     if (userStore.authData?.id === participant.userId) {
@@ -144,7 +156,6 @@ function truncate(text: string, length: number) {
 
 
 onMounted(async () => {
-    
     socket.emit('join', { roomId: Number(route.params.id) });
 
     await getRoomApi.initiate(undefined, {
@@ -296,6 +307,25 @@ const onLeave = () => {
     socket.emit('leave', { roomId: Number(route.params.id) })
 }
 
+const router = useRouter();
+
+const openProfile = async (participant: Participant) => {
+    await getUserApi.initiate(undefined, {
+        params: {
+            id: `${participant.userId}`
+        }
+    }); 
+    if (getUserApi && getUserApi.data) {
+        let routeData = router.resolve({
+            name: Routes.PROFILE,
+            params: {
+                username: getUserApi.data.username
+            }
+        });
+        window.open(routeData.href, '_blank');
+    }
+};
+
 </script>
 
 <template>
@@ -354,7 +384,11 @@ const onLeave = () => {
                                                 <template
                                                     v-for="participant in participants"
                                                 >
-                                                    <Card :padding="'none'">
+                                                    <Card
+                                                        :padding="'none'"
+                                                        @click="openProfile(participant.participant)"
+                                                        style="cursor: pointer;"
+                                                    >
                                                         <Row full-width :gap="'16'">
                                                             <div>
                                                                 <Avatar

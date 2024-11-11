@@ -37,7 +37,7 @@ export default {
     <div>
         <swiper
             class="sliderWrapper"
-            style="max-width: 1268px; width: 100%; border-radius: 15px"
+            style="max-width: 1440px; width: 100%; border-radius: 15px"
             :modules="modules"
             :pagination="{ clickable: true }"
             :autoplay="{ delay: 5000, disableOnInteraction: false }"

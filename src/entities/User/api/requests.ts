@@ -25,7 +25,7 @@ export const useFriendsApi = buildApi<User[]>(getFriendsNamespace, {
     withCredentials: true
 });
 
-export const useGetUserApi = buildApi(getUserNamespace, {
+export const useGetUserApi = buildApi<User>(getUserNamespace, {
     url: '/user',
     method: 'GET',
     withCredentials: true

@@ -198,7 +198,7 @@ const roomFormOpen = (value: boolean) => {
         >
             <Search />
         </Input>
-        <template v-if="(route.name === 'home')">
+        <template v-if="(route.name === 'home' || route.name === 'profile')">
             <Button
                 :variant="'blured'"
                 @click="roomFormOpen(true)"

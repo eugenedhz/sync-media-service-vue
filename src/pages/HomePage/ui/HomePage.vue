@@ -77,11 +77,11 @@ const navigateToRoom = (room: Room) => {
     });
 };
 
-const navigateToProfile = (user: User) => {
+const navigateToProfile = (username: string) => {
     router.push({
         name: Routes.PROFILE,
         params: {
-            id: user.id
+            username: username
         }
     });
 };
@@ -126,11 +126,11 @@ onMounted(async () => {
                     </Column>
                 </Column>
             </Page>
-        </div>
-        <div class="dark">
-            <Page>
-                <MediaGrid :media-rows="mediaRows"> Популярное </MediaGrid>
-            </Page>
+            <div class="dark">
+                <Page>
+                    <MediaGrid :media-rows="mediaRows"> Популярное </MediaGrid>
+                </Page>
+            </div>
         </div>
     </template>
 </template>
@@ -138,11 +138,12 @@ onMounted(async () => {
 <style scoped lang="css">
 @import url('@/app/styles/scrollbar.css');
 .background {
-    background:  linear-gradient(135deg, #2296ef, #03228f);
+    background:  linear-gradient(135deg, #000000, #03228f);
 }
 
 .dark {
     background: var(--qwarz-dark-primary);
+    border-radius: 20px;
 }
 
 .room-overflow {

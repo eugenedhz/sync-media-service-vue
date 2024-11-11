@@ -58,6 +58,10 @@
     gap: 32px;
 }
 
+.gap128 {
+    gap: 128px;
+}
+
 .full-width {
     width: 100%;
 }

@@ -5,6 +5,7 @@ import { LogInPage } from '@/pages/LogInPage';
 import { SignUpPage } from '@/pages/SignUpPage';
 import { Routes, getRouteHome, getRouteLogIn, getRouteProfile, getRouteRoom, getRouteSignUp } from '@/shared/consts/router';
 import { RoomPage } from '@/pages/RoomPage';
+import { ProfilePage } from '@/pages/ProfilePage';
 
 export const routes: RouteRecordRaw[] = [
     {
@@ -29,6 +30,12 @@ export const routes: RouteRecordRaw[] = [
         path: `${getRouteRoom()}/:id`,
         name: Routes.ROOM,
         component: RoomPage,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: `${getRouteProfile()}/:username`,
+        name: Routes.PROFILE,
+        component: ProfilePage,
         meta: { requiresAuth: true }
     }
 ];

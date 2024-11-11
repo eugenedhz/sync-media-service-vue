@@ -8,7 +8,7 @@ import { autoPlacement, offset, useFloating } from '@floating-ui/vue';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 import { __BASE_URL__ } from '@/shared/config/environment';
 import Logout from '@/shared/assets/icons/logout.svg?component'
-import Settings from '@/shared/assets/icons/settings.svg?component'
+import Profile from '@/shared/assets/icons/profile.svg?component'
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -55,6 +55,17 @@ const logout = async () => {
     router.push({ name: Routes.LOGIN })
 }
 
+const navigateToProfile = () => {
+    if (userStore && userStore.authData) {
+        router.push({
+            name: Routes.PROFILE,
+            params: {
+                username: userStore.authData.username
+            }
+        });
+    }
+};
+
 </script>
 
 <template>
@@ -65,13 +76,13 @@ const logout = async () => {
             </MenuButton>
         </div>
         <MenuItems ref="floating" :style="floatingStyles" class="list">
-                <MenuItem v-slot="{ active }" :disabled="true">
+                <MenuItem v-slot="{ active }">
                     <button
                         :class="{ selected: active }"
                         class="item"
-                        :disabled="true"
+                        @click="navigateToProfile()"
                     >
-                        <Settings/>
+                        <Profile/>
                     </button>
                 </MenuItem>
                 <MenuItem v-slot="{ active }">
