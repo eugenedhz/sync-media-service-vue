@@ -9,6 +9,7 @@ const buttonVariants = {
 } as const;
 
 export type ButtonVariant = ValueOf<typeof buttonVariants>;
+export type TypographySize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 
 const props = defineProps({
     disabled: {
@@ -24,8 +25,20 @@ const props = defineProps({
     },
     square: {
         type: Boolean
-    }
+    },
+    size: {
+        type: String as PropType<TypographySize>,
+        default: 'md'
+    },
 });
+
+const textSize: Record<TypographySize, string> = {
+    sm: 'size-sm',
+    md: 'size-md',
+    lg: 'size-lg',
+    xl: 'size-xl',
+    xxl: 'size-xxl',
+};
 
 const classes = computed(() => ({
     'full-width': props.fullWidth,
@@ -33,11 +46,17 @@ const classes = computed(() => ({
     'square': props.square,
     [props.variant]: true,
 }));
+
+const slotClasses = computed(() => ({
+    [textSize[props.size]]: true,
+}));
 </script>
 
 <template>
-    <button :disabled="disabled" type="button" :class="classes"> 
-        <slot></slot>
+    <button :disabled="disabled" type="button" :class="classes">
+        <div :class="slotClasses">
+            <slot></slot>
+        </div> 
     </button>
 </template>
 

@@ -73,6 +73,7 @@ input {
     text-shadow: var(--text-shadow);
     outline: none;
     color: var(--qwarz-light-primary);
+    cursor: pointer;
 }
 
 input::placeholder {

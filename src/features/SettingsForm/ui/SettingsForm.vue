@@ -139,100 +139,53 @@ onUnmounted(() => {
                 </Typography>
             </Row>
         </template>
-        <Column full-width>
-            <form @submit.prevent="submitForm">
-                <Card
-                    :padding="'none'"
-                    style="width: 850px;"
-                >
-                    <Row
-                        :align="'start'"
-                        :justify="'between'"
-                        :gap="'16'"
+        <form @submit.prevent="submitForm">
+            <Column full-width :align="'center'" :justify="'center'">
+                    <Card
+                        :padding="'none'"
+                        style="width: 80vw;"
                     >
-                        <Column full-width style="max-width: 300px;">
-                            <div class="avatar-container">
-                                <Avatar
-                                    :width="'300'"
-                                    :height="'300'"
-                                    :src="temporaryAvatar || (__BASE_URL__ + userStore.authData?.avatar)"
-                                />
-                                <!-- Затемнение и иконка -->
-                                <div class="overlay">
-                                    <Typography
-                                        :size="'md'"
-                                        :color="'pale'"
-                                        :weight="500"
-                                        :align="'center'"
-                                        class="search-icon"
-                                    >
-                                        Обновить фото
-                                    </Typography>
-                                    </div>
-                                <!-- Невидимый FileInput -->
-                                <FileInput
-                                    fullWidth
-                                    v-model="settingsFormStore.avatar"
-                                    accept=".jpg"
-                                    class="hidden-input"
-                                    @change="handleFileInputChange"
-                                />
-                            </div>
-                        </Column>
-                        <Column
+                        <Row
                             :align="'start'"
-                            :justify="'center'"
-                            full-width
-                            full-height
-                            style="max-height: 300px;"
+                            :justify="'between'"
+                            :gap="'16'"
                         >
-                            <Row
+                            <Column full-width style="max-width: 300px;">
+                                <div class="avatar-container">
+                                    <Avatar
+                                        :width="'300'"
+                                        :height="'300'"
+                                        :src="temporaryAvatar || (__BASE_URL__ + userStore.authData?.avatar)"
+                                    />
+                                    <!-- Затемнение и иконка -->
+                                    <div class="overlay">
+                                        <Typography
+                                            :size="'md'"
+                                            :color="'pale'"
+                                            :weight="500"
+                                            :align="'center'"
+                                            class="search-icon"
+                                        >
+                                            Обновить фото
+                                        </Typography>
+                                        </div>
+                                    <!-- Невидимый FileInput -->
+                                    <FileInput
+                                        fullWidth
+                                        v-model="settingsFormStore.avatar"
+                                        accept=".jpg"
+                                        class="hidden-input"
+                                        @change="handleFileInputChange"
+                                    />
+                                </div>
+                            </Column>
+                            <Column
                                 :align="'center'"
-                                :justify="'start'"
-                                :gap="'8'"
-                                class="input-row"
+                                :justify="'center'"
+                                full-width
+                                full-height
+                                style="max-height: 300px;"
                             >
-                                <Typography
-                                    :size="'md'"
-                                    :weight="500"
-                                    :align="'start'"
-                                    class="label"
-                                    :color="'pale'"
-                                >
-                                    имя:
-                                </Typography>
-                                <Input
-                                    :placeholder="'Крутое имя'"
-                                    v-model="settingsFormStore.displayName"
-                                    class="input-field"
-                                    :max="'30'"
-                                    @change="validateField('displayName', $event)"
-                                />
-                            </Row>
-                            <Row
-                                :align="'center'"
-                                :justify="'start'"
-                                :gap="'8'"
-                                class="input-row"
-                            >
-                                <Typography
-                                    :size="'md'"
-                                    :weight="500"
-                                    :align="'start'"
-                                    :color="'pale'"
-                                    class="label"
-                                >
-                                    статус:
-                                </Typography>
-                                <Input
-                                    :placeholder="'грустный статус'"
-                                    v-model="settingsFormStore.description"
-                                    class="input-field"
-                                    :max="'19'"
-                                    @change="validateField('description', $event)"
-                                />
-                            </Row>
-                            <Column>
                                 <Row
                                     :align="'center'"
                                     :justify="'start'"
@@ -246,21 +199,16 @@ onUnmounted(() => {
                                         class="label"
                                         :color="'pale'"
                                     >
-                                        логин:
+                                        имя:
                                     </Typography>
                                     <Input
-                                        :placeholder="'my_username'"
-                                        v-model="settingsFormStore.username"
+                                        :placeholder="'Крутое имя'"
+                                        v-model="settingsFormStore.displayName"
                                         class="input-field"
                                         :max="'30'"
-                                        @change="validateField('username', $event)"
+                                        @change="validateField('displayName', $event)"
                                     />
                                 </Row>
-                                <Typography :size="'sm'" :weight="400"  :color="'red'" v-if="errors.username">
-                                    {{ errors.username }}
-                                </Typography>
-                            </Column>
-                            <Column>
                                 <Row
                                     :align="'center'"
                                     :justify="'start'"
@@ -274,44 +222,94 @@ onUnmounted(() => {
                                         :color="'pale'"
                                         class="label"
                                     >
-                                        новый пароль:
+                                        статус:
                                     </Typography>
                                     <Input
-                                        :placeholder="'password'"
-                                        v-model="settingsFormStore.password"
+                                        :placeholder="'грустный статус'"
+                                        v-model="settingsFormStore.description"
                                         class="input-field"
                                         :max="'19'"
-                                        :type="'password'"
-                                        @change="validateField('password', $event)"
+                                        @change="validateField('description', $event)"
                                     />
                                 </Row>
-                                <Typography :size="'sm'" :weight="400"  :color="'red'" v-if="errors.password">
-                                    {{ errors.password }}
-                                </Typography>
+                                <Column>
+                                    <Row
+                                        :align="'center'"
+                                        :justify="'start'"
+                                        :gap="'8'"
+                                        class="input-row"
+                                    >
+                                        <Typography
+                                            :size="'md'"
+                                            :weight="500"
+                                            :align="'start'"
+                                            class="label"
+                                            :color="'pale'"
+                                        >
+                                            логин:
+                                        </Typography>
+                                        <Input
+                                            :placeholder="'my_username'"
+                                            v-model="settingsFormStore.username"
+                                            class="input-field"
+                                            :max="'30'"
+                                            @change="validateField('username', $event)"
+                                        />
+                                    </Row>
+                                    <Typography :size="'sm'" :weight="400"  :color="'red'" v-if="errors.username">
+                                        {{ errors.username }}
+                                    </Typography>
+                                </Column>
+                                <Column>
+                                    <Row
+                                        :align="'center'"
+                                        :justify="'start'"
+                                        :gap="'8'"
+                                        class="input-row"
+                                    >
+                                        <Typography
+                                            :size="'md'"
+                                            :weight="500"
+                                            :align="'start'"
+                                            :color="'pale'"
+                                            class="label"
+                                        >
+                                            новый пароль:
+                                        </Typography>
+                                        <Input
+                                            :placeholder="'password'"
+                                            v-model="settingsFormStore.password"
+                                            class="input-field"
+                                            :max="'19'"
+                                            :type="'password'"
+                                            @change="validateField('password', $event)"
+                                        />
+                                    </Row>
+                                    <Typography :size="'sm'" :weight="400"  :color="'red'" v-if="errors.password">
+                                        {{ errors.password }}
+                                    </Typography>
+                                </Column>
                             </Column>
-                        </Column>
-                        <Button
-                            type="submit"
-                            :align="'end'"
-                            square
-                            :disabled="disabled"
-                            :variant="'cleared'"
-                            style="align-self: flex-start; margin-top: 4px; margin-right: 4px; padding: 4px;"
-                        >
-                            <Save :class="buttonClass"/>
-                        </Button>
-                    </Row>
-                </Card>
-            </form>
-            <Typography :color="'red'">
-                {{ settingsFormStore.error }}
-            </Typography>
-        </Column>
+                            <Button
+                                type="submit"
+                                :align="'end'"
+                                square
+                                :disabled="disabled"
+                                :variant="'cleared'"
+                                style="align-self: flex-start; margin-top: 4px; margin-right: 4px; padding: 4px;"
+                            >
+                                <Save :class="buttonClass"/>
+                            </Button>
+                        </Row>
+                    </Card>
+                <Typography :color="'red'">
+                    {{ settingsFormStore.error }}
+                </Typography>
+            </Column>
+        </form>
     </Card>
 </template>
 <style lang="css">
-@import url('@/app/styles/scrollbar.css');
-
 .default-button {
     fill: white; /* Устанавливаем белый цвет */
     transition: filter 0.2s ease; /* Плавное изменение яркости */
@@ -383,9 +381,10 @@ onUnmounted(() => {
 
 .input-row {
     display: flex;
+    width: 40vw;
     align-items: center; /* Выравнивание по вертикали */
     gap: 4px; /* Пространство между элементами */
-    margin-bottom: 4px; /* Отступ снизу для каждого поля */
+    margin-bottom: 8px; /* Отступ снизу для каждого поля */
 }
 
 .label {

@@ -7,29 +7,19 @@ import {
 } from '@/entities/User';
 import { __BASE_URL__ } from '@/shared/config/environment';
 import { MediaGrid } from '@/features/MediaGrid';
-import { fetchAllMedias, MediaWithGenres, findMedias } from '@/entities/Media/api/requests';
+import { fetchAllMedias, MediaWithGenres } from '@/entities/Media/api/requests';
 import { RoomCardList, useGetAllRoomsApi, Room } from '@/entities/Room';
 import { Column, Typography, Row, Avatar, Card } from '@/shared/ui';
 import { useRouter, useRoute } from 'vue-router';
 import { Routes } from '@/shared/consts/router';
-import { useGetAllGenreApi } from '@/entities/Genre';
 import { SearchBar } from '@/widgets/SearchBar'
-
-const isOpen = ref(true)
-
-function setIsOpen(value: boolean) {
-    isOpen.value = value
-}
 
 const userStore = useUserStore();
 const userApi = useGetUserApi();
 const roomsApi = useGetAllRoomsApi();
-const genreApi = useGetAllGenreApi();
 
 const router = useRouter();
 const route = useRoute();
-
-const isLoading = ref(true);
 
 const mediaRows = ref<MediaWithGenres[][] | undefined>([]);
 const fetchMedias = async () => {
@@ -62,8 +52,6 @@ const navigateToRoom = (room: Room) => {
 const userProfile = ref(false);
 
 onMounted(async () => {
-    isLoading.value = true;
-
     if (userStore.authData?.username === route.params.username) {
         userProfile.value = true
     } else {
@@ -81,14 +69,10 @@ onMounted(async () => {
         }
     });
 
-    await Promise.all([fetchMedias(), genreApi.initiate()]);
-
-    isLoading.value = false;
+    await Promise.all([fetchMedias()]);
 });
 
 watch(() => route.params.username, async (newUsername) => {
-    isLoading.value = true;
-
     if (userStore.authData?.username === route.params.username) {
         userProfile.value = true
     } else {
@@ -106,8 +90,6 @@ watch(() => route.params.username, async (newUsername) => {
             filter_by: `creatorId{==}${userApi.data?.id}`
         }
     });
-
-    isLoading.value = false;
 });
 
 const handleDeleteRoom = async () => {
@@ -124,174 +106,172 @@ const handleDeleteRoom = async () => {
 </script>
 
 <template>
-    <template v-if="!isLoading && roomsApi?.data && mediaRows">
-        <div class="background">
-            <Page>
-                <Column :align="'start'" :gap="'32'" class="padding">
-                    <SearchBar/>
-                    <Card
-                        qwartz-primary
-                        full-width
-                    >
-                    <template #header>
-                        <Row full-width>
-                            <Typography
-                                :weight="600"
-                                :size="'xl'"
-                                v-if="userApi.data?.id !== userStore.authData?.id"
+    <div class="background">
+        <Page>
+            <Column :align="'start'" :gap="'32'" class="padding">
+                <SearchBar/>
+                <Card
+                    qwartz-primary
+                    full-width
+                >
+                <template #header>
+                    <Row full-width>
+                        <Typography
+                            :weight="600"
+                            :size="'xl'"
+                            v-if="userApi.data?.id !== userStore.authData?.id"
+                        >
+                            Профиль
+                        </Typography>
+                        <Typography
+                            :weight="600"
+                            :size="'xl'"
+                            v-if="userApi.data?.id === userStore.authData?.id"
+                        >
+                            Ваш профиль
+                        </Typography>
+                    </Row>
+                </template>
+                    <Row :align="'stretch'" :gap="'16'" style="margin-bottom: 32px;">
+                        <template v-if="userApi?.data">
+                            <Card
+                                :padding="'none'"
+                                style="width: 550px;"
                             >
-                                Профиль
-                            </Typography>
-                            <Typography
-                                :weight="600"
-                                :size="'xl'"
-                                v-if="userApi.data?.id === userStore.authData?.id"
-                            >
-                                Ваш профиль
-                            </Typography>
-                        </Row>
-                    </template>
-                        <Row :align="'stretch'" :gap="'16'" style="margin-bottom: 32px;">
-                            <template v-if="userApi?.data">
-                                <Card
-                                    :padding="'none'"
-                                    style="width: 550px;"
+                                <Row
+                                    :align="'start'"
+                                    :justify="'between'"
+                                    :gap="'16'"
                                 >
-                                    <Row
+                                    <div>
+                                        <Avatar
+                                            :width="'200'"
+                                            :height="'200'"
+                                            :src="__BASE_URL__ + userApi.data.avatar"
+                                        />
+                                    </div>
+                                    <Column
                                         :align="'start'"
-                                        :justify="'between'"
-                                        :gap="'16'"
+                                        :justify="'start'"
+                                        full-width
+                                        style="padding-top: 8px;"
                                     >
-                                        <div>
-                                            <Avatar
-                                                :width="'200'"
-                                                :height="'200'"
-                                                :src="__BASE_URL__ + userApi.data.avatar"
-                                            />
-                                        </div>
                                         <Column
                                             :align="'start'"
                                             :justify="'start'"
-                                            full-width
-                                            style="padding-top: 8px;"
+                                            style="padding-bottom: 16px;"
                                         >
-                                            <Column
-                                                :align="'start'"
-                                                :justify="'start'"
-                                                style="padding-bottom: 16px;"
+                                            <Typography
+                                                :size="'xl'"
+                                                :weight="600"
+                                                :align="'center'"
                                             >
-                                                <Typography
-                                                    :size="'xl'"
-                                                    :weight="600"
-                                                    :align="'center'"
-                                                >
-                                                    {{ userApi.data.displayName }}
-                                                </Typography>
-                                                <Typography
-                                                    :size="'sm'"
-                                                    :weight="400"
-                                                    :align="'center'"
-                                                    :color="'green'"
-                                                >
-                                                    @{{ userApi.data.username }}
-                                                </Typography>
-                                            </Column>
-                                            <Row
-                                                :align="'start'"
-                                                :justify="'start'"
+                                                {{ userApi.data.displayName }}
+                                            </Typography>
+                                            <Typography
+                                                :size="'sm'"
+                                                :weight="400"
+                                                :align="'center'"
+                                                :color="'green'"
                                             >
-                                                <template
-                                                    v-if="userApi.data.description !== null"
-                                                >
-                                                    <Typography
-                                                        :size="'md'"
-                                                        :weight="500"
-                                                        :align="'start'"
-                                                        :color="'pale'"
-                                                    >
-                                                        статус:
-                                                    </Typography>
-                                                    <Typography
-                                                        :size="'md'"
-                                                        :weight="500"
-                                                        :align="'start'"
-                                                    >
-                                                        {{ userApi.data.description }}
-                                                    </Typography>
-                                                </template>
-                                            </Row>
+                                                @{{ userApi.data.username }}
+                                            </Typography>
                                         </Column>
-                                    </Row>
-                                </Card>
-                            </template>
-                        </Row>
-                        <Card full-width>
-                            <template #header>
-                                <Row full-width>
-                                    <Typography
-                                        :weight="600"
-                                        :size="'xl'"
-                                        v-if="userApi.data?.id !== userStore.authData?.id"
-                                    >
-                                        Созданные комнаты от {{ userApi.data?.displayName }}
-                                    </Typography>
-                                    <Typography
-                                        :weight="600"
-                                        :size="'xl'"
-                                        v-if="userApi.data?.id === userStore.authData?.id"
-                                    >
-                                        Ваши комнаты
-                                    </Typography>
+                                        <Row
+                                            :align="'start'"
+                                            :justify="'start'"
+                                        >
+                                            <template
+                                                v-if="userApi.data.description !== null"
+                                            >
+                                                <Typography
+                                                    :size="'md'"
+                                                    :weight="500"
+                                                    :align="'start'"
+                                                    :color="'pale'"
+                                                >
+                                                    статус:
+                                                </Typography>
+                                                <Typography
+                                                    :size="'md'"
+                                                    :weight="500"
+                                                    :align="'start'"
+                                                >
+                                                    {{ userApi.data.description }}
+                                                </Typography>
+                                            </template>
+                                        </Row>
+                                    </Column>
                                 </Row>
-                            </template>
-                            <div
-                                class="ilow-scroll room-overflow"
-                                style="width: 100%;"
-                                v-if="
-                                        roomsApi?.data && roomsApi.data.length > 0
-                                    "
-                            >
-                                <RoomCardList
-                                    @room-click="navigateToRoom($event)"
-                                    class="padding-left"
-                                    :rooms="roomsApi?.data"
-                                    :isUserProfile="userProfile"
-                                    @deleted-room="handleDeleteRoom"
-                                />
-                            </div>
-                            <Typography
-                                :weight="500"
-                                :size="'lg'"
-                                :align="'center'"
-                                :color="'pale'"
-                                v-if="
-                                    roomsApi.data?.length === 0 && userApi.data?.id !== userStore.authData?.id
+                            </Card>
+                        </template>
+                    </Row>
+                    <Card full-width>
+                        <template #header>
+                            <Row full-width>
+                                <Typography
+                                    :weight="600"
+                                    :size="'xl'"
+                                    v-if="userApi.data?.id !== userStore.authData?.id"
+                                >
+                                    Созданные комнаты от {{ userApi.data?.displayName }}
+                                </Typography>
+                                <Typography
+                                    :weight="600"
+                                    :size="'xl'"
+                                    v-if="userApi.data?.id === userStore.authData?.id"
+                                >
+                                    Ваши комнаты
+                                </Typography>
+                            </Row>
+                        </template>
+                        <div
+                            class="ilow-scroll room-overflow"
+                            style="width: 100%;"
+                            v-if="
+                                    roomsApi?.data && roomsApi.data.length > 0
                                 "
-                            >
-                                грустно, {{ userApi.data?.displayName }} ещё ничего не добавил(
-                            </Typography>
-                            <Typography
-                                :weight="500"
-                                :size="'lg'"
-                                :align="'center'"
-                                :color="'pale'"
-                                v-if="
-                                    roomsApi.data?.length === 0 && userApi.data?.id === userStore.authData?.id
-                                "
-                            >
-                                грустно, вы ещё ничего не добавили(
-                            </Typography>
-                        </Card>
+                        >
+                            <RoomCardList
+                                @room-click="navigateToRoom($event)"
+                                class="padding-left"
+                                :rooms="roomsApi?.data"
+                                :isUserProfile="userProfile"
+                                @deleted-room="handleDeleteRoom"
+                            />
+                        </div>
+                        <Typography
+                            :weight="500"
+                            :size="'lg'"
+                            :align="'center'"
+                            :color="'pale'"
+                            v-if="
+                                roomsApi.data?.length === 0 && userApi.data?.id !== userStore.authData?.id
+                            "
+                        >
+                            грустно, {{ userApi.data?.displayName }} ещё ничего не добавил(
+                        </Typography>
+                        <Typography
+                            :weight="500"
+                            :size="'lg'"
+                            :align="'center'"
+                            :color="'pale'"
+                            v-if="
+                                roomsApi.data?.length === 0 && userApi.data?.id === userStore.authData?.id
+                            "
+                        >
+                            грустно, вы ещё ничего не добавили(
+                        </Typography>
                     </Card>
-                </Column>
+                </Card>
+            </Column>
+        </Page>
+        <div class="dark">
+            <Page>
+                <MediaGrid :media-rows="mediaRows"> Недавно добавленные фильмы </MediaGrid>
             </Page>
-            <div class="dark">
-                <Page>
-                    <MediaGrid :media-rows="mediaRows"> Недавно добавленные фильмы </MediaGrid>
-                </Page>
-            </div>
         </div>
-    </template>
+    </div>
 </template>
 
 <style scoped lang="css">

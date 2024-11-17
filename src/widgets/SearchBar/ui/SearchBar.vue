@@ -7,25 +7,19 @@ import Search from '@/shared/assets/icons/search.svg?component';
 import { useGetAllGenreApi, Genre } from '@/entities/Genre';
 import { debounce } from '@/shared/lib/helpers/debounce';
 import {
-    fetchAllMedias,
     MediaWithGenres,
     findMedias
 } from '@/entities/Media/api/requests';
-import { MediaSwiper } from '@/entities/Media';
-import { RoomCardList, useGetAllRoomsApi, Room } from '@/entities/Room';
 import { Column, Typography, Row, Input, Card, Tag, Button } from '@/shared/ui';
 import { MediaGrid } from '@/features/MediaGrid';
 import { CreateRoomForm } from '@/features/CreateRoomForm'
-import { RouterLink, useRouter, useRoute } from 'vue-router';
-import Add from '@/shared/assets/icons/add.svg?component'
+import { useRouter, useRoute } from 'vue-router';
 
 import {
     TransitionRoot,
     TransitionChild,
     Dialog,
     DialogPanel,
-    DialogTitle,
-    DialogDescription
 } from '@headlessui/vue';
 
 
@@ -212,11 +206,9 @@ const copyToClipboard = () => {
                 :variant="'blured'"
                 @click="roomFormOpen(true)"
                 style="width: 226px;"
+                :size="'sm'"
             >
-                <Typography
-                    :size="'sm'"
-                    :weight="400"
-                >новая комната</Typography>
+                новая комната
             </Button>
         </template>
         <template v-if="(route.name === 'room')">
@@ -224,11 +216,9 @@ const copyToClipboard = () => {
                 :variant="'blured'"
                 @click="copyToClipboard()"
                 style="width: 226px;"
+                :size="'sm'"
             >
-                <Typography
-                    :size="'sm'"
-                    :weight="400"
-                >ссылка на комнату</Typography>
+                ссылка на комнату
             </Button>
         </template>
         <AvatarDropdown />

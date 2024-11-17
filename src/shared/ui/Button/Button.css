@@ -117,3 +117,23 @@ button {
     opacity: 0.75;
     cursor: not-allowed;
 }
+
+.size-sm {
+    font: var(--font-s);
+}
+
+.size-md {
+    font: var(--font-m);
+}
+
+.size-lg {
+    font: var(--font-l);
+}
+
+.size-xl {
+    font: var(--font-xl);
+}
+
+.size-xxl {
+    font: var(--font-xxl);
+}
