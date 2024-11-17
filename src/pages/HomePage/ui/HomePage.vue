@@ -52,7 +52,7 @@ const navigateToRoom = (room: Room) => {
 };
 
 onMounted(async () => {
-    await Promise.all([fetchMedias(), roomsApi.initiate(undefined, {params: {limit: 20, offset: 0}}), genreApi.initiate()]);
+    await Promise.all([fetchMedias(), roomsApi.initiate(undefined, {params: {limit: 20, offset: 0, expand: 'participants'}}), genreApi.initiate()]);
 });
 </script>
 

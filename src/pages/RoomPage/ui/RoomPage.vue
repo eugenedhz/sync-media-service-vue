@@ -54,7 +54,10 @@ socket.on('connect', () => {
 });
 
 socket.on('disconnect', () => {
-    window.close()
+    isYouLeft.value = true
+    if (rootRef.value) {
+        rootRef.value.video.pause();
+    }
 });
 
 socket.on('joined', (participant) => {
@@ -102,10 +105,11 @@ socket.on('syncPlayerState', ({ currentTime, isPaused }) => {
 });
 
 const isRoomClosed = ref(false);
+const isYouLeft = ref(false);
 
 socket.on('roomDeleted', () => {
+    isRoomClosed.value = true;
     if (rootRef.value) {
-        isRoomClosed.value = true;
         rootRef.value.video.pause();
     }
 });
@@ -402,6 +406,40 @@ const navigateToHome = () => {
             <Column :align="'center'" :justify="'center'" full-width full-height style="max-height: 260px; gap: 64px">
                 <Typography :size="'lg'" :weight="600" :align="'center'">
                     Комната удалена создателем
+                </Typography>
+
+                <Button @click="navigateToHome" full-width>
+                    ОК
+                </Button>
+            </Column>
+        </Card>
+    </template>
+    <template v-if="isYouLeft">
+        <div
+            class="fixed inset-0 bg-black/25"
+            style="
+                position: fixed;
+                background: rgba(0, 0, 0, 0.45);
+                inset: 0;
+                z-index: 999;
+            "
+        />
+        <Card
+            full-width
+            full-height
+            style="
+                max-width: 480px;
+                max-height: 270px;
+                height: 100%;
+                position: fixed;
+                overflow-x: auto;
+                inset: 30% 0 0 36%;
+                z-index: 1000;
+            "
+        >
+            <Column :align="'center'" :justify="'center'" full-width full-height style="max-height: 260px; gap: 64px">
+                <Typography :size="'lg'" :weight="600" :align="'center'">
+                    Соединение прервано, возможно вы зашли в другую комнату
                 </Typography>
 
                 <Button @click="navigateToHome" full-width>

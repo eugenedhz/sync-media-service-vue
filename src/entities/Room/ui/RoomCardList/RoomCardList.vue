@@ -4,11 +4,11 @@ import { Room } from '../../model/types/room';
 import RoomCard from '../RoomCard/RoomCard.vue';
 import { Row, Button } from '@/shared/ui';
 import Delete from '@/shared/assets/icons/delete.svg?component';
-import { useDeleteRoomApi } from '../../api/requests';
+import { useDeleteRoomApi, RoomWithParticipants } from '../../api/requests';
 
 defineProps({
     rooms: {
-        type: Array as PropType<Room[]>
+        type: Array as PropType<RoomWithParticipants[]>
     },
     isUserProfile: {
         type: Boolean,
@@ -39,11 +39,11 @@ const deleteRoom = (room: Room | undefined) => {
 <template>
     <Row :gap="'16'" full-width>
         <template v-for="room in rooms" :key="room.id">
-            <div style="max-height: 110px;">
+            <div style="max-height: 110px; position: relative;">
                 <RoomCard :room="room" @click="$emit('room-click', room)"/>
 
-                <Button v-if="isUserProfile" @click="deleteRoom(room)" class="left-up">
-                    <Delete/>
+                <Button full-width :variant="'cleared'" v-if="isUserProfile" @click="deleteRoom(room)" class="left-up">
+                    <Delete class="default-button"/>
                 </Button>
             </div>
         </template>
@@ -52,10 +52,23 @@ const deleteRoom = (room: Room | undefined) => {
 
 <style lang="css" scoped>
 .left-up {
-    white-space: nowrap;
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(114%, -73%);
+    position: absolute;
+    top: 0;
+    right: 0;
+    max-width: 54px;
+    transform: translate(0, 0);
+}
+
+.default-button {
+    fill: white; /* Устанавливаем белый цвет */
+    transition: filter 0.2s ease; /* Плавное изменение яркости */
+}
+
+.default-button:hover {
+    filter: brightness(0.8); /* Затемняем на 40% при нажатии */
+}
+
+.default-button:active {
+    filter: brightness(0.6); /* Затемняем на 40% при нажатии */
 }
 </style>

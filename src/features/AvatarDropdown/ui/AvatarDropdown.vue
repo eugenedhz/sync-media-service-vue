@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, PropType } from 'vue'
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { Avatar, Dropdown } from '@/shared/ui';
 import { Routes } from '@/shared/consts/router';
 import { useUserStore } from '@/entities/User';
@@ -13,6 +13,7 @@ import Settings from '@/shared/assets/icons/settings.svg?component'
 
 const userStore = useUserStore();
 const router = useRouter();
+const route = useRoute();
 
 const items = ref([
     {
@@ -58,19 +59,36 @@ const logout = async () => {
 
 const navigateToProfile = () => {
     if (userStore && userStore.authData) {
-        router.push({
-            name: Routes.PROFILE,
-            params: {
-                username: userStore.authData.username
-            }
-        });
+        if (route.name === 'room') {
+            let routeData = router.resolve({
+                name: Routes.PROFILE,
+                params: {
+                    username: userStore.authData.username
+                }
+            });
+            window.open(routeData.href, '_blank');
+        } else {
+            router.push({
+                name: Routes.PROFILE,
+                params: {
+                    username: userStore.authData.username
+                }
+            });
+        }
     }
 };
 
 const navigateToSettings = () => {
-    router.push({
-        name: Routes.SETTINGS
-    });
+    if (route.name === 'room') {
+        let routeData = router.resolve({
+            name: Routes.SETTINGS
+        });
+        window.open(routeData.href, '_blank');
+    } else {
+        router.push({
+            name: Routes.SETTINGS
+        });
+    }
 };
 
 </script>
