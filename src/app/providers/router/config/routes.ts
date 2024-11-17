@@ -3,9 +3,18 @@ import { RouteRecordRaw } from 'vue-router';
 import { HomePage } from '@/pages/HomePage';
 import { LogInPage } from '@/pages/LogInPage';
 import { SignUpPage } from '@/pages/SignUpPage';
-import { Routes, getRouteHome, getRouteLogIn, getRouteProfile, getRouteRoom, getRouteSignUp } from '@/shared/consts/router';
+import { 
+    Routes,
+    getRouteHome,
+    getRouteLogIn,
+    getRouteProfile,
+    getRouteRoom,
+    getRouteSignUp,
+    getRouteSettings
+} from '@/shared/consts/router';
 import { RoomPage } from '@/pages/RoomPage';
 import { ProfilePage } from '@/pages/ProfilePage';
+import { SettingsPage } from '@/pages/SettingsPage';
 
 export const routes: RouteRecordRaw[] = [
     {
@@ -36,6 +45,12 @@ export const routes: RouteRecordRaw[] = [
         path: `${getRouteProfile()}/:username`,
         name: Routes.PROFILE,
         component: ProfilePage,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: getRouteSettings(),
+        name: Routes.SETTINGS,
+        component: SettingsPage,
         meta: { requiresAuth: true }
     }
 ];

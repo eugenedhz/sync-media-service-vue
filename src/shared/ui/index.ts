@@ -6,6 +6,7 @@ import Dropdown from './Dropdown/Dropdown.vue';
 import Column from './Flex/Column/Column.vue';
 import Row from './Flex/Row/Row.vue';
 import Input from './Input/Input.vue';
+import FileInput from './Input/FileInput.vue';
 import Switch from './Switch/Switch.vue';
 import Tag from './Tag/Tag.vue';
 import Typography from './Typography/Typography.vue';
@@ -17,6 +18,7 @@ export {
     Tag,
     Dropdown,
     Input,
+    FileInput,
     Switch,
     Checkbox,
     Card,

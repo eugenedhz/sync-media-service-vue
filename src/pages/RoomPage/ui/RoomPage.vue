@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { onMounted, onActivated, onBeforeUnmount, onBeforeMount, onDeactivated, Ref, ref, nextTick, watch, computed } from 'vue'; 
+import { onMounted, onBeforeUnmount, ref, nextTick, provide } from 'vue'; 
 import { socketService } from '@/shared/api';
 import { useRoute, useRouter } from 'vue-router';
 import { Routes } from '@/shared/consts/router';
 import { useUserStore, useGetUserApi } from '@/entities/User';
 import {
-    PlaylistMedia,
     useGetAllPlaylistMediaApi,
     Media
 } from '@/entities/Media';
@@ -26,7 +25,7 @@ import {
 } from '@/shared/ui';
 import { Participant } from '@/entities/Participant';
 import { SearchBar } from '@/widgets/SearchBar';
-import { debounce } from '@/shared/lib/helpers/debounce';
+import Button from '@/shared/ui/Button/Button.vue';
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -102,6 +101,15 @@ socket.on('syncPlayerState', ({ currentTime, isPaused }) => {
     }
 });
 
+const isRoomClosed = ref(false);
+
+socket.on('roomDeleted', () => {
+    if (rootRef.value) {
+        isRoomClosed.value = true;
+        rootRef.value.video.pause();
+    }
+});
+
 const playlistMediaApi = useGetAllPlaylistMediaApi();
 const videoMediaApi = useGetAllVideoMediaApi();
 const participantsApi = useGetAllParticipantsApi();
@@ -154,6 +162,8 @@ function truncate(text: string, length: number) {
     return text;
 }
 
+const getCreatorApi = useGetUserApi();
+
 
 onMounted(async () => {
     socket.emit('join', { roomId: Number(route.params.id) });
@@ -163,6 +173,12 @@ onMounted(async () => {
             id: `${route.params.id}`
         }
     }); 
+
+    await getCreatorApi.initiate(undefined, {
+        params: {
+            id: `${getRoomApi.data?.creatorId}`
+        }
+    });
 
     await participantsApi.initiate(undefined, {
         params: {
@@ -211,6 +227,7 @@ onBeforeUnmount(() => {
     socket.off('messageSent');
     socket.off('syncPlayerState')
     socket.off('left')
+    socket.off('roomDeleted')
     if (route.params?.id) socket.emit('leave', { roomId: Number(route.params.id) })
     cleanup();
 });
@@ -254,6 +271,7 @@ const setPlayListMediaToPlayer = (playlistMediaId: number) => {
 };
 
 socket.on('playlistMediaSettedToPlayer', async (playlistMedia) => {
+    console.log('setted player')
     await videoMediaApi.initiate(undefined, {
         params: {
             filter_by: `mediaId{==}${playlistMedia.mediaId}`
@@ -326,9 +344,77 @@ const openProfile = async (participant: Participant) => {
     }
 };
 
+
+const navigateToCreator = async () => {
+    let routeData = router.resolve({
+        name: Routes.PROFILE,
+        params: {
+            username: getCreatorApi.data?.username
+        }
+    });
+    window.open(routeData.href, '_blank');
+}
+
+
+const showNotif = ref(false);
+
+const showNotification = () => {
+    showNotif.value = true;
+    setTimeout(() => {
+        showNotif.value = false;
+    }, 2000);
+};
+
+provide('showNotification', showNotification);
+
+const navigateToHome = () => {
+    router.push({
+        name: Routes.HOME
+    })
+}
+
 </script>
 
 <template>
+    <template v-if="isRoomClosed">
+        <div
+            class="fixed inset-0 bg-black/25"
+            style="
+                position: fixed;
+                background: rgba(0, 0, 0, 0.45);
+                inset: 0;
+                z-index: 999;
+            "
+        />
+        <Card
+            full-width
+            full-height
+            style="
+                max-width: 480px;
+                max-height: 270px;
+                height: 100%;
+                position: fixed;
+                overflow-x: auto;
+                inset: 30% 0 0 36%;
+                z-index: 1000;
+            "
+        >
+            <Column :align="'center'" :justify="'center'" full-width full-height style="max-height: 260px; gap: 64px">
+                <Typography :size="'lg'" :weight="600" :align="'center'">
+                    Комната удалена создателем
+                </Typography>
+
+                <Button @click="navigateToHome" full-width>
+                    ОК
+                </Button>
+            </Column>
+        </Card>
+    </template>
+    <Card v-if="showNotif" class="notification">
+        <Typography :size="'sm'" :weight="400" :color="'pale'">
+            Ссылка на комнату скопирована
+        </Typography>
+    </Card>
     <div class="wr">
         <section class="wrapper">
             <Page>
@@ -358,13 +444,29 @@ const openProfile = async (participant: Participant) => {
                                     width="'30'"
                                 >
                                     <template #header>
-                                        <Row full-width>
+                                        <Row full-width :justify="'between'">
                                             <Typography
                                                 :weight="600"
                                                 :size="'lg'"
                                             >
                                                 Участники
                                             </Typography>
+
+                                            <Button
+                                                :variant="'cleared'"
+                                                @click="navigateToCreator"
+                                                square
+                                            >
+                                                <Typography
+                                                    :weight="500"
+                                                    :color="'pale'"
+                                                    class="save-icon"
+                                                    :size="'md'"
+                                                    style="cursor: pointer;"
+                                                >
+                                                    создатель
+                                                </Typography>
+                                            </Button>
                                         </Row>
                                     </template>
                                     <Column
@@ -388,6 +490,7 @@ const openProfile = async (participant: Participant) => {
                                                         :padding="'none'"
                                                         @click="openProfile(participant.participant)"
                                                         style="cursor: pointer;"
+                                                        class="participant"
                                                     >
                                                         <Row full-width :gap="'16'">
                                                             <div>
@@ -451,11 +554,10 @@ const openProfile = async (participant: Participant) => {
                                                 <template
                                                     v-for="playlistMedia in playlistMediaApi?.data"
                                                 >
-                                                    <Card :padding="'none'">
+                                                    <Card :padding="'none'" class="participant" style="cursor: pointer;">
                                                         <Row
                                                             full-width
                                                             :gap="'16'"
-                                                            class="pointer"
                                                             @click="
                                                                 setPlayListMediaToPlayer(
                                                                     playlistMedia.id
@@ -552,6 +654,9 @@ const openProfile = async (participant: Participant) => {
                                                                                 .participant
                                                                                 .avatar
                                                                         "
+                                                                        class="participant"
+                                                                        @click="openProfile(message.participant)"
+                                                                        style="cursor: pointer;"
                                                                     />
                                                                 </div>
                                                                 <Typography
@@ -655,6 +760,61 @@ const openProfile = async (participant: Participant) => {
 </template>
 
 <style scoped lang="css">
+.save-icon {
+    fill: white; /* Устанавливаем белый цвет */
+    transition: filter 0.2s ease; /* Плавное изменение яркости */
+}
+
+.save-icon:hover {
+    filter: brightness(0.8); /* Затемняем на 40% при нажатии */
+}
+
+.save-icon:active {
+    filter: brightness(0.6); /* Затемняем на 40% при нажатии */
+}
+
+.participant {
+    transition: filter 0.2s ease;
+}
+
+.participant:hover {
+    filter: brightness(0.8); /* Затемняем на 40% при нажатии */
+}
+
+.participant:active {
+    filter: brightness(0.6); /* Затемняем на 40% при нажатии */
+}
+
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInOut 2s forwards;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(20px); /* Начальная позиция ниже */
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  90% {
+    opacity: 1; /* Уведомление остается видимым */
+    transform: translateY(0px);
+  }
+  100% {
+    opacity: 0; /* Исчезновение без перемещения */
+    transform: translateY(0px);
+  }
+}
+
 html {
     background: var(--qwarz-dark-secondary);
 }

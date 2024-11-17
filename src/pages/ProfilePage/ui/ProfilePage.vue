@@ -2,16 +2,12 @@
 import { onMounted, ref, watch } from 'vue';
 import { Page } from '@/widgets/Page';
 import {
-    useFriendsApi,
     useGetUserApi,
     useUserStore,
-    UserLabelList,
-    User
 } from '@/entities/User';
 import { __BASE_URL__ } from '@/shared/config/environment';
 import { MediaGrid } from '@/features/MediaGrid';
 import { fetchAllMedias, MediaWithGenres, findMedias } from '@/entities/Media/api/requests';
-import { MediaSwiper } from '@/entities/Media';
 import { RoomCardList, useGetAllRoomsApi, Room } from '@/entities/Room';
 import { Column, Typography, Row, Avatar, Card } from '@/shared/ui';
 import { useRouter, useRoute } from 'vue-router';
@@ -27,7 +23,6 @@ function setIsOpen(value: boolean) {
 
 const userStore = useUserStore();
 const userApi = useGetUserApi();
-const friendsApi = useFriendsApi();
 const roomsApi = useGetAllRoomsApi();
 const genreApi = useGetAllGenreApi();
 
@@ -64,8 +59,17 @@ const navigateToRoom = (room: Room) => {
     });
 };
 
+const userProfile = ref(false);
+
 onMounted(async () => {
     isLoading.value = true;
+
+    if (userStore.authData?.username === route.params.username) {
+        userProfile.value = true
+    } else {
+        userProfile.value = false
+    }
+
     await userApi.initiate(undefined, {
         params: {
             username: `${route.params.username}`
@@ -85,6 +89,12 @@ onMounted(async () => {
 watch(() => route.params.username, async (newUsername) => {
     isLoading.value = true;
 
+    if (userStore.authData?.username === route.params.username) {
+        userProfile.value = true
+    } else {
+        userProfile.value = false
+    }
+
     await userApi.initiate(undefined, {
         params: {
             username: newUsername
@@ -99,6 +109,18 @@ watch(() => route.params.username, async (newUsername) => {
 
     isLoading.value = false;
 });
+
+const handleDeleteRoom = async () => {
+    console.log('rerender')
+    setTimeout(async () => {
+        await roomsApi.initiate(undefined, {
+            params: {
+                filter_by: `creatorId{==}${userApi.data?.id}`
+            }
+        });
+    }, 100);
+    console.log(roomsApi?.data)
+}
 </script>
 
 <template>
@@ -111,6 +133,24 @@ watch(() => route.params.username, async (newUsername) => {
                         qwartz-primary
                         full-width
                     >
+                    <template #header>
+                        <Row full-width>
+                            <Typography
+                                :weight="600"
+                                :size="'xl'"
+                                v-if="userApi.data?.id !== userStore.authData?.id"
+                            >
+                                Профиль
+                            </Typography>
+                            <Typography
+                                :weight="600"
+                                :size="'xl'"
+                                v-if="userApi.data?.id === userStore.authData?.id"
+                            >
+                                Ваш профиль
+                            </Typography>
+                        </Row>
+                    </template>
                         <Row :align="'stretch'" :gap="'16'" style="margin-bottom: 32px;">
                             <template v-if="userApi?.data">
                                 <Card
@@ -185,27 +225,69 @@ watch(() => route.params.username, async (newUsername) => {
                                 </Card>
                             </template>
                         </Row>
-                        <Column :gap="'16'" :align="'start'">
-                            <Typography :size="'xl'" :weight="600">
-                                Созданные комнаты
-                            </Typography>
-                            <div class="ilow-scroll room-overflow">
-                                <RoomCardList
-                                    v-if="
+                        <Card full-width>
+                            <template #header>
+                                <Row full-width>
+                                    <Typography
+                                        :weight="600"
+                                        :size="'xl'"
+                                        v-if="userApi.data?.id !== userStore.authData?.id"
+                                    >
+                                        Созданные комнаты от {{ userApi.data?.displayName }}
+                                    </Typography>
+                                    <Typography
+                                        :weight="600"
+                                        :size="'xl'"
+                                        v-if="userApi.data?.id === userStore.authData?.id"
+                                    >
+                                        Ваши комнаты
+                                    </Typography>
+                                </Row>
+                            </template>
+                            <div
+                                class="ilow-scroll room-overflow"
+                                style="width: 100%;"
+                                v-if="
                                         roomsApi?.data && roomsApi.data.length > 0
                                     "
+                            >
+                                <RoomCardList
                                     @room-click="navigateToRoom($event)"
                                     class="padding-left"
                                     :rooms="roomsApi?.data"
+                                    :isUserProfile="userProfile"
+                                    @deleted-room="handleDeleteRoom"
                                 />
                             </div>
-                        </Column>
+                            <Typography
+                                :weight="500"
+                                :size="'lg'"
+                                :align="'center'"
+                                :color="'pale'"
+                                v-if="
+                                    roomsApi.data?.length === 0 && userApi.data?.id !== userStore.authData?.id
+                                "
+                            >
+                                грустно, {{ userApi.data?.displayName }} ещё ничего не добавил(
+                            </Typography>
+                            <Typography
+                                :weight="500"
+                                :size="'lg'"
+                                :align="'center'"
+                                :color="'pale'"
+                                v-if="
+                                    roomsApi.data?.length === 0 && userApi.data?.id === userStore.authData?.id
+                                "
+                            >
+                                грустно, вы ещё ничего не добавили(
+                            </Typography>
+                        </Card>
                     </Card>
                 </Column>
             </Page>
             <div class="dark">
                 <Page>
-                    <MediaGrid :media-rows="mediaRows"> Популярное </MediaGrid>
+                    <MediaGrid :media-rows="mediaRows"> Недавно добавленные фильмы </MediaGrid>
                 </Page>
             </div>
         </div>
@@ -224,7 +306,6 @@ watch(() => route.params.username, async (newUsername) => {
 }
 
 .room-overflow {
-    max-width: 1410px;
     overflow: auto;
 }
 

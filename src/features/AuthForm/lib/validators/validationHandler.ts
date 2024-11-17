@@ -31,6 +31,9 @@ const validationDisplayName = (
 const validationPasswordLenght = (
     password: string
 ): boolean | string => {
+    if (password.length === 0) {
+        return true
+    }
     if (password.length < 8) {
         return authValidationMessages.INVALID_LENGTH.PASSWORD;
     }
@@ -40,6 +43,9 @@ const validationPasswordLenght = (
 const validationPasswordRegexp = (
     password: string
 ): boolean | string => {
+    if (password === '') {
+        return true
+    }
     const regexp = /^[a-zA-Z0-9.@_-]+$/;
     if (!regexp.test(password)) {
         return authValidationMessages.REGEXP_MISMATCH.PASSWORD;

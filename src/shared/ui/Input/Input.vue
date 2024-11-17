@@ -31,6 +31,10 @@ const props = defineProps({
     type: {
         type: String,
         default: 'text'
+    },
+    max: {
+        type: String,
+        default: ''
     }
 });
 
@@ -47,8 +51,10 @@ const classes = computed(() => ({
             :value="modelValue"
             :placeholder="placeholder"
             :type="type"
+            :maxlength="max"
             @blur="$emit('blur')"
             @focus="$emit('focus')"
+
             @input="
                 $emit(
                     'update:modelValue',

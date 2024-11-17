@@ -1,18 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { Page } from '@/widgets/Page';
-import {
-    useFriendsApi,
-    useUserStore,
-    UserLabelList,
-    User
-} from '@/entities/User';
 import { __BASE_URL__ } from '@/shared/config/environment';
 import { MediaGrid } from '@/features/MediaGrid';
 import { fetchAllMedias, MediaWithGenres, findMedias } from '@/entities/Media/api/requests';
 import { MediaSwiper } from '@/entities/Media';
 import { RoomCardList, useGetAllRoomsApi, Room } from '@/entities/Room';
-import { Column, Typography, Row } from '@/shared/ui';
+import { Column, Typography, Card } from '@/shared/ui';
 import { useRouter } from 'vue-router';
 import { Routes } from '@/shared/consts/router';
 import { useGetAllGenreApi } from '@/entities/Genre';
@@ -20,14 +14,6 @@ import { useGetAllGenreApi } from '@/entities/Genre';
 
 import { SearchBar } from '@/widgets/SearchBar'
 
-const isOpen = ref(true)
-
-function setIsOpen(value: boolean) {
-    isOpen.value = value
-}
-
-const userStore = useUserStore();
-const friendsApi = useFriendsApi();
 const roomsApi = useGetAllRoomsApi();
 const genreApi = useGetAllGenreApi();
 const isFriendsIsLoading = ref<boolean>(false);
@@ -56,18 +42,6 @@ const fetchMedias = async () => {
     }
 };
 
-const fetchFriends = () => {
-    if (!userStore?.authData?.id) {
-        return;
-    }
-
-    friendsApi.initiate(undefined, {
-        params: {
-            id: userStore?.authData.id
-        }
-    });
-};
-
 const navigateToRoom = (room: Room) => {
     router.push({
         name: Routes.ROOM,
@@ -77,43 +51,30 @@ const navigateToRoom = (room: Room) => {
     });
 };
 
-const navigateToProfile = (username: string) => {
-    router.push({
-        name: Routes.PROFILE,
-        params: {
-            username: username
-        }
-    });
-};
-
 onMounted(async () => {
-    await Promise.all([fetchMedias(), fetchFriends(), roomsApi.initiate(), genreApi.initiate()]);
+    await Promise.all([fetchMedias(), roomsApi.initiate(undefined, {params: {limit: 20, offset: 0}}), genreApi.initiate()]);
 });
 </script>
 
 <template>
-    <template v-if="friendsApi?.data && roomsApi?.data && mediaRows">
+    <template v-if="roomsApi?.data && mediaRows">
         <div class="background">
             <Page>
                 <Column :align="'start'" :gap="'32'" class="padding">
                     <SearchBar/>
-                    <Row :align="'stretch'" :gap="'16'">
-                        <UserLabelList
-                            v-if="
-                                friendsApi?.data && friendsApi.data.length > 0
-                            "
-                            @user-click="navigateToProfile($event)"
-                            class="ilow-scroll"
-                            :users="friendsApi.data"
-                            :is-loading="isFriendsIsLoading"
-                        />
-                        <MediaSwiper :medias="mediaRows?.[0]" />
-                    </Row>
-                    <Column :gap="'16'" :align="'start'">
-                        <Typography :size="'xl'" :weight="600">
-                            Комнаты
-                        </Typography>
-                        <div class="ilow-scroll room-overflow">
+                    <MediaSwiper :medias="mediaRows?.[0]" />
+                    <Card full-width>
+                        <template #header>
+                            <Row full-width>
+                                <Typography
+                                    :weight="600"
+                                    :size="'xl'"
+                                >
+                                    Недавно добавленные комнаты
+                                </Typography>
+                            </Row>
+                        </template>
+                        <div class="ilow-scroll room-overflow" style="width: 100%;">
                             <RoomCardList
                                 v-if="
                                     roomsApi?.data && roomsApi.data.length > 0
@@ -123,12 +84,12 @@ onMounted(async () => {
                                 :rooms="roomsApi?.data"
                             />
                         </div>
-                    </Column>
+                    </Card>
                 </Column>
             </Page>
             <div class="dark">
                 <Page>
-                    <MediaGrid :media-rows="mediaRows"> Популярное </MediaGrid>
+                    <MediaGrid :media-rows="mediaRows"> Недавно добавленные фильмы </MediaGrid>
                 </Page>
             </div>
         </div>
@@ -147,7 +108,6 @@ onMounted(async () => {
 }
 
 .room-overflow {
-    max-width: 1440px;
     overflow: auto;
 }
 

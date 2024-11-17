@@ -1,6 +1,7 @@
 .typography {
     color: var(--qwarz-light-primary);
     font: var(--font-m);
+    cursor: default;
 }
 
 .primary {

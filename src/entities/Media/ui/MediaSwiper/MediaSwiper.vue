@@ -34,32 +34,30 @@ export default {
 </script>
 
 <template>
-    <div>
-        <swiper
-            class="sliderWrapper"
-            style="max-width: 1440px; width: 100%; border-radius: 15px"
-            :modules="modules"
-            :pagination="{ clickable: true }"
-            :autoplay="{ delay: 5000, disableOnInteraction: false }"
+    <swiper
+        class="sliderWrapper"
+        style="width: 100%; border-radius: 15px"
+        :modules="modules"
+        :pagination="{ clickable: true }"
+        :autoplay="{ delay: 5000, disableOnInteraction: false }"
+    >
+        <template
+            v-for="media in medias"
+            :key="media.id"
+            :virtualIndex="media.id"
         >
-            <template
-                v-for="media in medias"
-                :key="media.id"
-                :virtualIndex="media.id"
-            >
-                <swiper-slide :height="'371px'">
-                    <div>
-                        <img
-                            :width="'100%'"
-                            style="object-fit: cover"
-                            :height="'371px'"
-                            :src="url + media.preview"
-                        />
-                    </div>
-                </swiper-slide>
-            </template>
-        </swiper>
-    </div>
+            <swiper-slide :height="'371px'">
+                <div>
+                    <img
+                        :width="'100%'"
+                        style="object-fit: cover"
+                        :height="'371px'"
+                        :src="url + media.preview"
+                    />
+                </div>
+            </swiper-slide>
+        </template>
+    </swiper>
 </template>
 
 <style scoped lang="css">

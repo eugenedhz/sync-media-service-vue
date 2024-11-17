@@ -47,6 +47,7 @@ const submitForm = async () => {
                         v-model="createRoomFormStore.title"
                         :placeholder="'Имя комнаты'"
                         full-width
+                        :max="'20'"
                     />
                     <Button
                         type="submit"

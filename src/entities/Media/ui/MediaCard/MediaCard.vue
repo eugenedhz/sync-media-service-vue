@@ -13,13 +13,12 @@ defineProps({
 </script>
 
 <template>
-    <div class="pointer">
-        <Image 
-            :width="255"
-            :height="333"
-            :src="media.thumbnail"
-        />
-    </div>
+    <Image 
+        :width="255"
+        :height="333"
+        :src="media.thumbnail"
+        style="cursor: pointer;"
+    />
 </template>
 
 <style scoped>

@@ -3,7 +3,8 @@ export const Routes = {
     LOGIN: 'login',
     SIGNUP: 'signup',
     ROOM: 'room',
-    PROFILE: 'profile'
+    PROFILE: 'profile',
+    SETTINGS: 'settings'
 } as const;
 
 export type Route = ValueOf<typeof Routes>;
@@ -13,3 +14,4 @@ export const getRouteLogIn = () => '/login';
 export const getRouteSignUp = () => '/signup';
 export const getRouteRoom = () => '/room';
 export const getRouteProfile = () => '/profile';
+export const getRouteSettings = () => '/settings';

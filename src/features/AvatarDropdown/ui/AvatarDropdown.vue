@@ -9,6 +9,7 @@ import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 import { __BASE_URL__ } from '@/shared/config/environment';
 import Logout from '@/shared/assets/icons/logout.svg?component'
 import Profile from '@/shared/assets/icons/profile.svg?component'
+import Settings from '@/shared/assets/icons/settings.svg?component'
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -66,6 +67,12 @@ const navigateToProfile = () => {
     }
 };
 
+const navigateToSettings = () => {
+    router.push({
+        name: Routes.SETTINGS
+    });
+};
+
 </script>
 
 <template>
@@ -83,6 +90,15 @@ const navigateToProfile = () => {
                         @click="navigateToProfile()"
                     >
                         <Profile/>
+                    </button>
+                </MenuItem>
+                <MenuItem v-slot="{ active }">
+                    <button
+                        :class="{ selected: active }"
+                        class="item"
+                        @click="navigateToSettings()"
+                    >
+                        <Settings/>
                     </button>
                 </MenuItem>
                 <MenuItem v-slot="{ active }">

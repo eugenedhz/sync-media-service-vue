@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 
 import { AvatarDropdown } from '@/features/AvatarDropdown';
 import Logo from '@/shared/assets/icons/logo.svg?component';
@@ -113,6 +113,15 @@ const roomFormOpen = (value: boolean) => {
     isRoomFormOpen.value = value; 
 }
 
+const showNotification = inject('showNotification') as () => void;
+
+const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href)
+    .then(() => {
+        showNotification();
+    })
+}
+
 </script>
 
 <template>
@@ -208,6 +217,18 @@ const roomFormOpen = (value: boolean) => {
                     :size="'sm'"
                     :weight="400"
                 >новая комната</Typography>
+            </Button>
+        </template>
+        <template v-if="(route.name === 'room')">
+            <Button
+                :variant="'blured'"
+                @click="copyToClipboard()"
+                style="width: 226px;"
+            >
+                <Typography
+                    :size="'sm'"
+                    :weight="400"
+                >ссылка на комнату</Typography>
             </Button>
         </template>
         <AvatarDropdown />

@@ -22,13 +22,22 @@ defineProps({
 
 <style lang="css" scoped>
 .container {
+    cursor: pointer;
     overflow: hidden;
     position: relative;
     width: 313px;
     height: 92px;
     border-radius: 15px;
     box-shadow: var(--shadow);
-    cursor: pointer;
+    transition: filter 0.2s ease;
+}
+
+.container:hover {
+    filter: brightness(0.8);
+}
+
+.container:active {
+    filter: brightness(0.6);
 }
 
 img {
@@ -38,6 +47,7 @@ img {
     filter: brightness(0.6);
 }
 .centered {
+    cursor: pointer;
     white-space: nowrap;
     position: absolute;
     top: 50%;

@@ -21,3 +21,9 @@ export const useGetRoomApi = buildApi<Room, void>('getRoom', {
     url: '/room',
     method: 'GET'
 });
+
+export const useDeleteRoomApi = buildApi<Room, void>('deleteRoom', {
+    url: '/room',
+    method: 'DELETE',
+    withCredentials: true
+});
