@@ -224,7 +224,7 @@ onMounted(async () => {
         if (currentVideo.value && !isPausedVal && rootRef.value) {
             rootRef.value.video.play();
         }
-    }, 200)
+    }, 10)
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     if (!mediaQuery.matches) {
