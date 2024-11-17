@@ -418,8 +418,10 @@ const navigateToHome = () => {
     <div class="wr">
         <section class="wrapper">
             <Page>
-                <Column :gap="'32'">
+                <Column :align="'start'" :gap="'32'" class="padding">
                     <SearchBar @add-media="addPlaylistMedia($event)" @leave="onLeave()"/>
+                </Column>
+                <Column :gap="'32'">
                     <Column full-width :gap="'16'">
                         <div>
                             <VideoPlayer
@@ -760,6 +762,11 @@ const navigateToHome = () => {
 </template>
 
 <style scoped lang="css">
+.padding {
+    padding: 16px 32px;
+    padding-top: 0;
+}
+
 .save-icon {
     fill: white; /* Устанавливаем белый цвет */
     transition: filter 0.2s ease; /* Плавное изменение яркости */
