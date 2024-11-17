@@ -152,11 +152,13 @@ onUnmounted(() => {
                         >
                             <Column full-width style="max-width: 300px;">
                                 <div class="avatar-container">
-                                    <Avatar
-                                        :width="'300'"
-                                        :height="'300'"
-                                        :src="temporaryAvatar || (__BASE_URL__ + userStore.authData?.avatar)"
-                                    />
+                                    <div>
+                                        <Avatar
+                                            :width="'300'"
+                                            :height="'300'"
+                                            :src="temporaryAvatar || (__BASE_URL__ + userStore.authData?.avatar)"
+                                        />
+                                    </div>
                                     <!-- Затемнение и иконка -->
                                     <div class="overlay">
                                         <Typography
@@ -353,6 +355,7 @@ onUnmounted(() => {
     justify-content: center;
     transition: background-color 0.3s ease;
     z-index: 5; /* Поверх аватарки */
+    border-radius: 10px;
 }
 
 .avatar-container:hover .overlay {

@@ -6,7 +6,8 @@ import { Routes } from '@/shared/consts/router';
 import { useUserStore, useGetUserApi } from '@/entities/User';
 import {
     useGetAllPlaylistMediaApi,
-    Media
+    Media,
+    PlaylistMedia
 } from '@/entities/Media';
 import { useGetAllParticipantsApi } from '@/entities/Participant';
 import { useGetRoomApi } from '@/entities/Room';
@@ -26,6 +27,7 @@ import {
 import { Participant } from '@/entities/Participant';
 import { SearchBar } from '@/widgets/SearchBar';
 import Button from '@/shared/ui/Button/Button.vue';
+import Delete from '@/shared/assets/icons/delete.svg?component';
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -93,9 +95,12 @@ socket.on('sendPlayerStateFromClient', ({ userSID }) => {
 
 socket.on('error', (e) => console.log(e));
 
+var isPausedVal = true 
+
 socket.on('syncPlayerState', ({ currentTime, isPaused }) => {
     if (rootRef.value) {
         rootRef.value.video.currentTime = currentTime;
+        isPausedVal = isPaused
         if (isPaused) {
             rootRef.value.video.pause();
         } else {
@@ -117,6 +122,7 @@ socket.on('roomDeleted', () => {
 const playlistMediaApi = useGetAllPlaylistMediaApi();
 const videoMediaApi = useGetAllVideoMediaApi();
 const participantsApi = useGetAllParticipantsApi();
+const drawn = ref(false)
 
 const draw = () => {
     ctx.value.drawImage(
@@ -207,12 +213,18 @@ onMounted(async () => {
     });
 
     const mediaId = playlistMediaApi.data?.[0].mediaId;
+    currentMedia = playlistMediaApi.data?.[0]
     await videoMediaApi.initiate(undefined, {
         params: {
             filter_by: `mediaId{==}${mediaId}`
         }
     });
     currentVideo.value = videoMediaApi.data?.[0].source!;
+    setTimeout(async () => {
+        if (currentVideo.value && !isPausedVal && rootRef.value) {
+            rootRef.value.video.play();
+        }
+    }, 200)
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     if (!mediaQuery.matches) {
@@ -274,8 +286,15 @@ const setPlayListMediaToPlayer = (playlistMediaId: number) => {
     socket.emit('setPlaylistMediaToPlayer', { playlistMediaId });
 };
 
+const deletePlaylistMedia = (playlistMediaId: number) => {
+    socket.emit('deletePlaylistMedia', { playlistMediaId });
+};
+
+var currentMedia: (PlaylistMedia | undefined)
+
 socket.on('playlistMediaSettedToPlayer', async (playlistMedia) => {
-    console.log('setted player')
+    currentMedia = playlistMedia
+
     await videoMediaApi.initiate(undefined, {
         params: {
             filter_by: `mediaId{==}${playlistMedia.mediaId}`
@@ -320,6 +339,45 @@ socket.on('playlistMediaAdded', () => {
             filter_by: `roomId{==}${route.params.id}`
         }
     });
+});
+
+socket.on('playlistMediaDeleted', async () => {
+    await playlistMediaApi.initiate(undefined, {
+        params: {
+            filter_by: `roomId{==}${route.params.id}`
+        }
+    });
+    let iscurrent = true
+    if (currentMedia && playlistMediaApi.data?.length !== 0) {
+        iscurrent = playlistMediaApi.data?.[0].mediaId === currentMedia.mediaId
+    }
+
+    if (!iscurrent || playlistMediaApi.data?.length === 0) {
+        if (playlistMediaApi.data?.length !== 0 && playlistMediaApi.data) {
+            console.log(playlistMediaApi.data)
+            currentMedia = playlistMediaApi.data[0]
+
+            await videoMediaApi.initiate(undefined, {
+                params: {
+                    filter_by: `mediaId{==}${currentMedia.mediaId}`
+                }
+            });
+
+            currentVideo.value = videoMediaApi.data?.[0].source!;
+            await playlistMediaApi.initiate(undefined, {
+                params: {
+                    filter_by: `roomId{==}${route.params.id}`
+                }
+            });
+        } else {
+            currentVideo.value = ''
+        }
+        if (rootRef.value) {
+                console.log('stop')
+                rootRef.value.video.pause();
+                rootRef.value.video.currentTime = 0;
+            }
+    }
 });
 
 const addPlaylistMedia = (media: Media) => {
@@ -594,7 +652,18 @@ const navigateToHome = () => {
                                                 <template
                                                     v-for="playlistMedia in playlistMediaApi?.data"
                                                 >
-                                                    <Card :padding="'none'" class="participant" style="cursor: pointer;">
+                                                    <Card :padding="'none'" class="participant" style="cursor: pointer; position: relative;">
+                                                        <Button
+                                                            :variant="'cleared'"
+                                                            @click="
+                                                                deletePlaylistMedia(
+                                                                    playlistMedia.id
+                                                                )
+                                                            "
+                                                            class="right-up"
+                                                        >
+                                                            <Delete class="default-button"/>
+                                                        </Button>
                                                         <Row
                                                             full-width
                                                             :gap="'16'"
@@ -800,6 +869,27 @@ const navigateToHome = () => {
 </template>
 
 <style scoped lang="css">
+.default-button {
+    fill: white; /* Устанавливаем белый цвет */
+    transition: filter 0.2s ease; /* Плавное изменение яркости */
+}
+
+.default-button:hover {
+    filter: brightness(0.8); /* Затемняем на 40% при нажатии */
+}
+
+.default-button:active {
+    filter: brightness(0.6); /* Затемняем на 40% при нажатии */
+}
+
+.right-up {
+    position: absolute;
+    top: 15px;
+    right: 0;
+    max-width: 54px;
+    transform: translate(0, 0);
+}
+
 .padding {
     padding: 16px 32px;
     padding-top: 0;
