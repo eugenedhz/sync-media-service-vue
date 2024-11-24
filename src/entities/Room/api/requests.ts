@@ -9,14 +9,18 @@ export const useGetAllRoomsApi = buildApi<RoomWithParticipants[], void>('getAllR
     method: 'GET'
 });
 
-export interface CreateRoomArgs {
-    title: string;
-}
-
-export const useCreateRoomApi = buildApi<Room, CreateRoomArgs>('createRoom', {
+export const useCreateRoomApi = buildApi<Room, FormData>('createRoom', {
     url: '/room',
     method: 'POST',
-    withCredentials: true
+    withCredentials: true,
+    headers: {'Content-Type': 'multipart/form-data'}
+});
+
+export const useUpdateRoomApi = buildApi<Room, FormData>('updateRoom', {
+    url: '/room',
+    method: 'PATCH',
+    withCredentials: true,
+    headers: {'Content-Type': 'multipart/form-data'}
 });
 
 export const useGetRoomApi = buildApi<RoomWithParticipants, void>('getRoom', {

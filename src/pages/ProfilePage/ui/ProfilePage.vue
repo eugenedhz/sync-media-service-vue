@@ -14,9 +14,19 @@ import { useRouter, useRoute } from 'vue-router';
 import { Routes } from '@/shared/consts/router';
 import { SearchBar } from '@/widgets/SearchBar'
 import { useGetAllParticipantsApi } from '@/entities/Participant';
+import { useGetAllGenreApi } from '@/entities/Genre';
+import { UpdateRoomForm } from '@/features/UpdateRoomForm';
+
+import {
+    TransitionRoot,
+    TransitionChild,
+    Dialog,
+    DialogPanel,
+} from '@headlessui/vue';
 
 const userStore = useUserStore();
 const userApi = useGetUserApi();
+const genreApi = useGetAllGenreApi();
 const roomsApi = useGetAllRoomsApi();
 const getRoomApi = useGetRoomApi();
 const participantApi = useGetAllParticipantsApi();
@@ -76,7 +86,7 @@ onMounted(async () => {
 
     await fetchUserCurrentRoom()
 
-    await Promise.all([fetchMedias()]);
+    await Promise.all([fetchMedias(), genreApi.initiate()]);
 });
 
 watch(() => route.params.username, async (newUsername) => {
@@ -102,15 +112,19 @@ watch(() => route.params.username, async (newUsername) => {
     });
 });
 
-const handleDeleteRoom = async () => {
+const handleDeleteRoom = async (room: Room) => {
     console.log('rerender')
     setTimeout(async () => {
         await roomsApi.initiate(undefined, {
             params: {
-                filter_by: `creatorId{==}${userApi.data?.id}`
+                filter_by: `creatorId{==}${userApi.data?.id}`,
+                expand: 'participants'
             }
         });
-    }, 100);
+        if (getRoomApi.data?.id === room.id) {
+            await fetchUserCurrentRoom()
+        }
+    }, 200);
 }
 
 const fetchUserCurrentRoom = async () => {
@@ -133,9 +147,107 @@ const fetchUserCurrentRoom = async () => {
 
     return getRoomApi.data
 }
+
+const updatingRoom = ref<Room>();
+const updateFormOpen = ref(false);
+
+const formOpen = (isop: boolean) => {
+    updateFormOpen.value = isop
+}
+
+const handleUpdateRoom = (room: Room) => {
+    updatingRoom.value = room;
+    formOpen(true)
+}
+
+const handleUpdated = async (room: Room) => {
+    formOpen(false)
+    await roomsApi.initiate(undefined, {
+        params: {
+            filter_by: `creatorId{==}${userApi.data?.id}`,
+            expand: 'participants'
+        }
+    });
+    if (getRoomApi.data?.id === room.id) {
+        await fetchUserCurrentRoom()
+    }
+}
 </script>
 
 <template>
+    <div>
+        <TransitionRoot appear :show="updateFormOpen" as="template">
+            <Dialog
+                as="div"
+                @close="formOpen(false)"
+                class="relative z-10"
+                style="position: relative; z-index: 10"
+            >
+                <TransitionChild
+                    as="template"
+                    enter="duration-300 ease-out"
+                    enter-from="opacity-0"
+                    enter-to="opacity-100"
+                    leave="duration-200 ease-in"
+                    leave-from="opacity-100"
+                    leave-to="opacity-0"
+                >
+                    <div
+                        class="fixed inset-0 bg-black/25"
+                        style="
+                            position: fixed;
+                            background: rgba(0, 0, 0, 0.45);
+                            inset: 0;
+                        "
+                    />
+                </TransitionChild>
+                <div
+                    class="fixed inset-0 overflow-y-auto"
+                    style="position: fixed; inset: 0; overflow-x: auto; top: 25%"
+                >
+                    <div
+                        class="flex min-h-full items-center justify-center p-4 text-center"
+                        style="
+                            display: flex;
+                            justify-items: center;
+                            flex-direction: column;
+                            align-items: center;
+                            text-align: start;
+                            justify-content: start;
+                        "
+                    >
+                        <TransitionChild
+                            as="template"
+                            enter="duration-300 ease-out"
+                            enter-from="opacity-0 scale-95"
+                            enter-to="opacity-100 scale-100"
+                            leave="duration-200 ease-in"
+                            leave-from="opacity-100 scale-100"
+                            leave-to="opacity-0 scale-95"
+                        >
+                            <DialogPanel
+                                class="max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
+                                style="
+                                    width: 100%;
+                                    height: 100%;
+                                    max-width: 500px;
+                                    max-height: 500px;
+                                    padding-top: 30px;
+                                    overflow: hidden;
+                                    transition: all;
+                                    vertical-align: middle;
+                                "
+                            >
+                                <div v-if="updatingRoom">
+                                    <UpdateRoomForm :room="updatingRoom" @updater="handleUpdated($event)"></UpdateRoomForm>
+                                </div>
+                            </DialogPanel>
+                        </TransitionChild>
+                    </div>
+                </div>
+            </Dialog>
+        </TransitionRoot>
+    </div>
     <div class="background">
         <Page>
             <Column :align="'start'" :gap="'32'" class="padding">
@@ -308,7 +420,8 @@ const fetchUserCurrentRoom = async () => {
                                     class="padding-left"
                                     :rooms="roomsApi?.data"
                                     :isUserProfile="userProfile"
-                                    @deleted-room="handleDeleteRoom"
+                                    @deleted-room="handleDeleteRoom($event)"
+                                    @update-room="handleUpdateRoom($event)"
                                 />
                             </div>
                             <Typography

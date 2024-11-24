@@ -4,4 +4,13 @@
 
 img {
     border-radius: 10px;
+    transition: filter 0.2s ease;
+}
+
+img:hover {
+    filter: brightness(0.8);
+}
+
+img:active {
+    filter: brightness(0.6);
 }

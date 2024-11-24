@@ -14,12 +14,16 @@ const props = defineProps({
     src: {
         type: String,
         default: ''
+    },
+    default: {
+        type: String,
+        default: DefaultAvatar
     }
 });
 
 const imageSrc = computed(() => {
     const finalSrc = props.src?.endsWith("null") ? null : props.src;
-    return finalSrc || DefaultAvatar;
+    return finalSrc || props.default;
 });
 
 </script>

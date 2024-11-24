@@ -18,12 +18,6 @@ span {
     width: 100%;
 }
 
-.tag:hover {
-    background-color: rgba(var(--qwarz-dark-secondary-value) / 0.3);
-    color: var(--qwarz-light-secondary);
-    backdrop-filter: var(--blur-hover);
-}
-
 .tag:active {
     background-color: rgba(var(--qwarz-dark-tertiary-value) / 0.3);
     color: var(--qwarz-light-tertiary);

@@ -35,7 +35,8 @@ api.interceptors.response.use(
 
                 return api.request(originalRequest);
             } catch (e) {
-                console.error('Refresh token error: ', e);
+                localStorage.clear()
+                return api.request(originalRequest);
             }
         }
         

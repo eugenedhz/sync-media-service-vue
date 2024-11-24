@@ -7,6 +7,7 @@ import { Room, useCreateRoomApi } from '@/entities/Room';
 export const createRoomFormNamespace = 'createRoomForm';
 
 export interface CreateRoomFormSchema {
+    cover: File | undefined;
     title: string;
     error?: string;
 }
@@ -25,6 +26,7 @@ export const useCreateRoomFormStore = defineStore<
     CreateRoomFormActionsSchema
 >(createRoomFormNamespace, {
     state: (): CreateRoomFormSchema => ({
+        cover: undefined,
         title: '',
         error: undefined
     }),
@@ -32,16 +34,27 @@ export const useCreateRoomFormStore = defineStore<
         async createRoom() {
             this.error = undefined;
             const createRoomApi = useCreateRoomApi();
-            const response = await createRoomApi.initiate({
-                title: this.title
-            });
+            const formData = new FormData();
+
+            if (this.title === '') {
+                this.error = 'Заполните имя комнаты'
+                return
+            }
+            if (!this.cover) {
+                this.error = 'Добавьте обложку комнаты'
+                return
+            }
+
+            formData.append('cover', this.cover);
+            formData.append('title', this.title);
+            const response = await createRoomApi.initiate(formData);
             if (response) {
                 return response;
             }
-            this.error = createRoomApi.error;
         },
         resetForm() {
             this.title = '';
+            this.cover = undefined;
             this.error = undefined;
         }
     }

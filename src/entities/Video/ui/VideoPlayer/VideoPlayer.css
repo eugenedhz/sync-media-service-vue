@@ -1,11 +1,19 @@
 .video-container {
     border-radius: 10px;
-    overflow: hidden;
     position: relative;
+    overflow: hidden;
     width: 100%;
     display: flex;
     justify-content: center;
+    align-items: stretch;
     margin-inline: auto;
+    min-height: 492px;
+    max-height: 492px;
+    background-color: #000;
+}
+
+video {
+    width: 100%;
 }
 
 .video-container.full-screen {
@@ -15,10 +23,6 @@
 
 .video-container.full-screen {
     max-height: 100vh;
-}
-
-video {
-    width: 100%;
 }
 
 .video-controls-container {
@@ -43,10 +47,31 @@ video {
     pointer-events: none;
 }
 
+/* Оригинальные стили */
 .video-container:hover .video-controls-container,
 .video-container:focus-within .video-controls-container,
 .video-container.paused .video-controls-container {
     opacity: 1;
+}
+
+/* Новые стили для полноэкранного режима */
+.video-container.fullscreen .video-controls-container {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.video-container.fullscreen.show-controls .video-controls-container {
+    opacity: 1;
+}
+
+/* Скрытие курсора, когда контролы скрыты в полноэкранном режиме */
+.video-container.fullscreen:not(.show-controls) {
+    cursor: none;
+}
+
+/* Показ курсора при активных контролах */
+.video-container.fullscreen.show-controls {
+    cursor: default;
 }
 
 .video-controls-container .controls {

@@ -112,6 +112,7 @@ defineProps({
 const emit = defineEmits([
     'playerInit',
     'timeUpdate',
+    'timeSkip',
     'playToggle'
 ])
 
@@ -268,6 +269,7 @@ const volumeChange = () => {
 const skip = (duration: number) => {
     if (!video?.value) return;
     video.value.currentTime += duration;
+    emit('timeSkip', { currentTime: video.value.currentTime, isPaused: video.value.paused });
 };
 
 const applyHotkeys = (e: KeyboardEvent) => {
@@ -309,17 +311,54 @@ const applyTimelineUpdate = (e: MouseEvent) => {
     if (isScrubbing.value) handleTimelineUpdate(e);
 };
 
+const isFullScreen = ref(false);
+let hideControlsTimer: ReturnType<typeof setTimeout> | undefined = undefined;
+
+const showControls = () => {
+    videoContainer.value?.classList.add('show-controls');
+    clearTimeout(hideControlsTimer);
+    hideControlsTimer = setTimeout(hideControls, 3000);
+};
+
+const hideControls = () => {
+    if (isFullScreen.value) {
+        videoContainer.value?.classList.remove('show-controls');
+    }
+};
+
 const applyFullScreen = () => {
-    videoContainer.value?.classList.toggle(
-        'full-screen',
-        document.fullscreenElement as unknown as boolean
-    );
+    isFullScreen.value = Boolean(document.fullscreenElement);
+
+    if (isFullScreen.value) {
+        videoContainer.value?.classList.add('fullscreen');
+        showControls();
+        document.addEventListener('mousemove', handleMouseMove);
+    } else {
+        videoContainer.value?.classList.remove('fullscreen');
+        document.removeEventListener('mousemove', handleMouseMove);
+        clearTimeout(hideControlsTimer);
+        videoContainer.value?.classList.add('show-controls'); // Always show controls when exiting fullscreen
+    }
+};
+
+const handleMouseMove = () => {
+    showControls();
+
+    // Сбрасываем курсор через 3 секунды, если мышь не двигается
+    videoContainer.value?.classList.add('show-controls');
+    clearTimeout(hideControlsTimer);
+
+    hideControlsTimer = setTimeout(() => {
+        hideControls();
+        videoContainer.value?.classList.remove('show-controls'); // Скрытие курсора
+    }, 3000);
 };
 
 onMounted(() => {
     document.addEventListener('keydown', applyHotkeys);
     document.addEventListener('mouseup', applyScrubbing);
     document.addEventListener('mousemove', applyTimelineUpdate);
+    document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('fullscreenchange', applyFullScreen);
     emit('playerInit', video)
 });
@@ -328,6 +367,7 @@ onUnmounted(() => {
     document.removeEventListener('keydown', applyHotkeys);
     document.removeEventListener('mouseup', applyScrubbing);
     document.removeEventListener('mousemove', applyTimelineUpdate);
+    document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('fullscreenchange', applyFullScreen);
 });
 </script>

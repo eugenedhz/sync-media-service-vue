@@ -28,8 +28,10 @@ import { Participant } from '@/entities/Participant';
 import { SearchBar } from '@/widgets/SearchBar';
 import Button from '@/shared/ui/Button/Button.vue';
 import Delete from '@/shared/assets/icons/delete.svg?component';
+import { useGetAllGenreApi } from '@/entities/Genre';
 
 const route = useRoute();
+const genreApi = useGetAllGenreApi();
 const userStore = useUserStore();
 const rootRef = ref<{ video: HTMLVideoElement } | null>(null);
 const step = ref<number>();
@@ -176,6 +178,7 @@ const getCreatorApi = useGetUserApi();
 
 
 onMounted(async () => {
+    await genreApi.initiate()
     socket.emit('join', { roomId: Number(route.params.id) });
 
     await getRoomApi.initiate(undefined, {
@@ -315,10 +318,10 @@ socket.on('playlistMediaSettedToPlayer', async (playlistMedia) => {
 
 const submit = (e: Event) => {
     e.preventDefault();
-    socket.emit('sendMessage', {
-        roomId: Number(route.params.id),
-        message: message.value
-    });
+        socket.emit('sendMessage', {
+            roomId: Number(route.params.id),
+            message: message.value
+        });
     message.value = '';
 };
 
@@ -328,7 +331,10 @@ socket.on('messageSent', async (msg) => {
 
     requestAnimationFrame(() => {
         if (chatWindow.value) {
-            chatWindow.value.scrollTop = chatWindow.value.scrollHeight;
+            const isAtBottom = chatWindow.value.scrollTop >= (chatWindow.value.scrollHeight - chatWindow.value.clientHeight - 100);
+            if (isAtBottom) {
+                chatWindow.value.scrollTop = chatWindow.value.scrollHeight;
+            }
         }
     });
 });
@@ -339,6 +345,10 @@ socket.on('playlistMediaAdded', () => {
             filter_by: `roomId{==}${route.params.id}`
         }
     });
+    showNotifMediaAdded.value = true;
+    setTimeout(() => {
+        showNotifMediaAdded.value = false;
+    }, 2000);
 });
 
 socket.on('playlistMediaDeleted', async () => {
@@ -354,7 +364,6 @@ socket.on('playlistMediaDeleted', async () => {
 
     if (!iscurrent || playlistMediaApi.data?.length === 0) {
         if (playlistMediaApi.data?.length !== 0 && playlistMediaApi.data) {
-            console.log(playlistMediaApi.data)
             currentMedia = playlistMediaApi.data[0]
 
             await videoMediaApi.initiate(undefined, {
@@ -381,7 +390,15 @@ socket.on('playlistMediaDeleted', async () => {
 });
 
 const addPlaylistMedia = (media: Media) => {
-    socket.emit('addPlaylistMedia', { roomId: Number(route.params.id), mediaId: media.id });
+    if (!playlistMediaApi.data?.some(obj => obj.mediaId === media.id)) {
+        socket.emit('addPlaylistMedia', { roomId: Number(route.params.id), mediaId: media.id });
+        return
+    }
+
+    showNotifMediaCant.value = true;
+    setTimeout(() => {
+        showNotifMediaCant.value = false;
+    }, 2000);
 };
 const onLeave = () => {
     socket.emit('leave', { roomId: Number(route.params.id) })
@@ -419,6 +436,8 @@ const navigateToCreator = async () => {
 
 
 const showNotif = ref(false);
+const showNotifMediaAdded = ref(false);
+const showNotifMediaCant = ref(false);
 
 const showNotification = () => {
     showNotif.value = true;
@@ -497,7 +516,7 @@ const navigateToHome = () => {
         >
             <Column :align="'center'" :justify="'center'" full-width full-height style="max-height: 260px; gap: 64px">
                 <Typography :size="'lg'" :weight="600" :align="'center'">
-                    Соединение прервано, возможно вы зашли в другую комнату
+                    Соединение прервано, возможно, вы зашли в другую комнату или нет интернет соединения
                 </Typography>
 
                 <Button @click="navigateToHome" full-width>
@@ -507,8 +526,18 @@ const navigateToHome = () => {
         </Card>
     </template>
     <Card v-if="showNotif" class="notification">
-        <Typography :size="'sm'" :weight="400" :color="'pale'">
-            Ссылка на комнату скопирована
+        <Typography :size="'sm'" :weight="400" :color="'pale'" :align="'center'">
+            Ссылка на комнату скопирована!
+        </Typography>
+    </Card>
+    <Card v-if="showNotifMediaAdded" class="notification">
+        <Typography :size="'sm'" :weight="400" :color="'pale'" :align="'center'">
+            Фильм был успешно добавлен!
+        </Typography>
+    </Card>
+    <Card v-if="showNotifMediaCant" class="notification">
+        <Typography :size="'sm'" :weight="400" :color="'red'" :align="'center'">
+            Фильм уже добавлен в плейлист.
         </Typography>
     </Card>
     <div class="wr">
@@ -519,23 +548,185 @@ const navigateToHome = () => {
                 </Column>
                 <Column :gap="'32'">
                     <Column full-width :gap="'16'">
-                        <div>
-                            <VideoPlayer
-                                ref="rootRef"
-                                :video="video"
-                                @player-init="playerInit($event)"
-                                @time-update="timeUpdate($event)"
-                                @play-toggle="playToggle($event)"
-                                :src="
-                                    __BASE_URL__ +
-                                    currentVideo +
-                                    '?quality=1080p'
-                                "
+                        <Row full-width :gap="'16'" style="padding: 0 32px 0 32px;">
+                            <div style="flex: 3;">
+                                <VideoPlayer
+                                    ref="rootRef"
+                                    :video="video"
+                                    @player-init="playerInit($event)"
+                                    @time-update="timeUpdate($event)"
+                                    @time-skip="timeUpdate($event)"
+                                    @play-toggle="playToggle($event)"
+                                    :src="
+                                        __BASE_URL__ +
+                                        currentVideo +
+                                        '?quality=1080p'
+                                    "
+                                >
+                                </VideoPlayer>
+                            </div>
+                            <Card
+                                :material="'qwartz-primary'"
+                                style="flex: 1; height: 100%; max-height: 492px; min-height: 492px;"
                             >
-                            </VideoPlayer>
-                        </div>
+                                <template #header>
+                                    <Row full-width>
+                                        <Typography
+                                            :weight="600"
+                                            :size="'lg'"
+                                        >
+                                            Чат
+                                        </Typography>
+                                    </Row>
+                                </template>
+                                <Column :align="'center'" full-height>
+                                    <div
+                                        ref="chatWindow"
+                                        class="ilow-scroll"
+                                        style="
+                                            overflow-y: auto;
+                                            flex: 1;
+                                            max-height: 349px;
+                                            width: 100%;
+                                            scroll-behavior: smooth;
+                                        "
+                                    >
+                                        <Column
+                                            :gap="'16'"
+                                            :align="'start'"
+                                            full-width
+                                        >
+                                            <template
+                                                v-for="message in messages"
+                                            >
+                                                <Row
+                                                    :align="'stretch'"
+                                                    :gap="'16'"
+                                                    full-width
+                                                    :justify="
+                                                        message.participant
+                                                            .userId ===
+                                                        userStore!.authData!
+                                                            .id
+                                                            ? 'end'
+                                                            : 'start'
+                                                    "
+                                                >
+                                                    <template
+                                                        v-if="
+                                                            !(
+                                                                message
+                                                                    .participant
+                                                                    .userId ===
+                                                                userStore!
+                                                                    .authData!
+                                                                    .id
+                                                            )
+                                                        "
+                                                    >
+                                                        <Column>
+                                                            <div>
+                                                                <Avatar
+                                                                    :src="
+                                                                        __BASE_URL__ +
+                                                                        message
+                                                                            .participant
+                                                                            .avatar
+                                                                    "
+                                                                    class="participant"
+                                                                    @click="openProfile(message.participant)"
+                                                                    style="cursor: pointer;"
+                                                                />
+                                                            </div>
+                                                            <Typography
+                                                                :weight="400"
+                                                                :size="'sm'"
+                                                                :color="'pale'"
+                                                            >
+                                                                {{ truncate(message
+                                                                        .participant
+                                                                        .name, 5
+                                                                    )
+                                                                }}
+                                                            </Typography>
+                                                        </Column>
+                                                    </template>
+                                                    <Card
+                                                        :padding="'sm'"
+                                                        :material="
+                                                            message
+                                                                .participant
+                                                                .userId ===
+                                                            userStore!
+                                                                .authData!.id
+                                                                ? 'qwartz-inverted'
+                                                                : 'qwartz-secondary'
+                                                        "
+                                                        style="
+                                                            display: flex;
+                                                            align-items: center;
+                                                            justify-content: center;
+                                                            max-width: 60%;
+                                                        "
+                                                    >
+                                                        <Typography
+                                                            :size="'sm'"
+                                                            :weight="600"
+                                                            :color="
+                                                                message
+                                                                    .participant
+                                                                    .userId ===
+                                                                userStore!
+                                                                    .authData!
+                                                                    .id
+                                                                    ? 'inverted'
+                                                                    : 'primary'
+                                                            "
+                                                            >{{
+                                                                message.message
+                                                            }}</Typography
+                                                        >
+                                                    </Card>
+                                                    <template
+                                                        v-if="
+                                                            message
+                                                                .participant
+                                                                .userId ===
+                                                            userStore!
+                                                                .authData!.id
+                                                        "
+                                                    >
+                                                        <Avatar
+                                                            :src="
+                                                                __BASE_URL__ +
+                                                                message
+                                                                    .participant
+                                                                    .avatar
+                                                            "
+                                                        />
+                                                    </template>
+                                                </Row>
+                                            </template>
+                                        </Column>
+                                    </div>
+                                    <form
+                                        @submit="submit"
+                                        style="
+                                            width: 100%;
+                                            padding: 8px 0 0 0;
+                                        "
+                                        >
+                                        <Input
+                                            :placeholder="'Сообщение..'"
+                                            v-model="message"
+                                            full-width
+                                        />
+                                    </form>
+                                </Column>
+                            </Card>
+                        </Row>
                         <Column full-width>
-                            <Row :gap="'16'" :align="'stretch'" full-width>
+                            <Row :gap="'16'" :align="'stretch'" full-width style="padding: 0 32px 0 32px;">
                                 <Card
                                     :material="'qwartz-primary'"
                                     style="flex: 1"
@@ -650,9 +841,10 @@ const navigateToHome = () => {
                                                 :gap="'8'"
                                             >
                                                 <template
-                                                    v-for="playlistMedia in playlistMediaApi?.data"
+                                                    v-for="(playlistMedia, index) in playlistMediaApi?.data"
+                                                    :key="playlistMedia.id"
                                                 >
-                                                    <Card :padding="'none'" class="participant" style="cursor: pointer; position: relative;">
+                                                    <Card :class="{ 'with-border': index === 0 }" :padding="'none'" class="participant" style="cursor: pointer; position: relative;">
                                                         <Button
                                                             :variant="'cleared'"
                                                             @click="
@@ -696,160 +888,6 @@ const navigateToHome = () => {
                                         </div>
                                     </Column>
                                 </Card>
-                                <Card
-                                    :material="'qwartz-primary'"
-                                    style="flex: 1"
-                                >
-                                    <template #header>
-                                        <Row full-width>
-                                            <Typography
-                                                :weight="600"
-                                                :size="'lg'"
-                                            >
-                                                Чат
-                                            </Typography>
-                                        </Row>
-                                    </template>
-                                    <Column :align="'center'">
-                                        <div
-                                            ref="chatWindow"
-                                            class="ilow-scroll"
-                                            style="
-                                                overflow-y: auto;
-                                                height: 330px;
-                                                width: 100%;
-                                                scroll-behavior: smooth;
-                                            "
-                                        >
-                                            <Column
-                                                :gap="'16'"
-                                                :align="'start'"
-                                                full-width
-                                            >
-                                                <template
-                                                    v-for="message in messages"
-                                                >
-                                                    <Row
-                                                        :align="'stretch'"
-                                                        :gap="'16'"
-                                                        full-width
-                                                        :justify="
-                                                            message.participant
-                                                                .userId ===
-                                                            userStore!.authData!
-                                                                .id
-                                                                ? 'end'
-                                                                : 'start'
-                                                        "
-                                                    >
-                                                        <template
-                                                            v-if="
-                                                                !(
-                                                                    message
-                                                                        .participant
-                                                                        .userId ===
-                                                                    userStore!
-                                                                        .authData!
-                                                                        .id
-                                                                )
-                                                            "
-                                                        >
-                                                            <Column>
-                                                                <div>
-                                                                    <Avatar
-                                                                        :src="
-                                                                            __BASE_URL__ +
-                                                                            message
-                                                                                .participant
-                                                                                .avatar
-                                                                        "
-                                                                        class="participant"
-                                                                        @click="openProfile(message.participant)"
-                                                                        style="cursor: pointer;"
-                                                                    />
-                                                                </div>
-                                                                <Typography
-                                                                    :weight="400"
-                                                                    :size="'sm'"
-                                                                    :color="'pale'"
-                                                                >
-                                                                    {{ truncate(message
-                                                                            .participant
-                                                                            .name, 5
-                                                                        )
-                                                                    }}
-                                                                </Typography>
-                                                            </Column>
-                                                        </template>
-                                                        <Card
-                                                            :padding="'sm'"
-                                                            :material="
-                                                                message
-                                                                    .participant
-                                                                    .userId ===
-                                                                userStore!
-                                                                    .authData!.id
-                                                                    ? 'qwartz-inverted'
-                                                                    : 'qwartz-secondary'
-                                                            "
-                                                            style="
-                                                                display: flex;
-                                                                align-items: center;
-                                                                justify-content: center;
-                                                                max-width: 60%;
-                                                            "
-                                                        >
-                                                            <Typography
-                                                                :size="'sm'"
-                                                                :weight="600"
-                                                                :color="
-                                                                    message
-                                                                        .participant
-                                                                        .userId ===
-                                                                    userStore!
-                                                                        .authData!
-                                                                        .id
-                                                                        ? 'inverted'
-                                                                        : 'primary'
-                                                                "
-                                                                >{{
-                                                                    message.message
-                                                                }}</Typography
-                                                            >
-                                                        </Card>
-                                                        <template
-                                                            v-if="
-                                                                message
-                                                                    .participant
-                                                                    .userId ===
-                                                                userStore!
-                                                                    .authData!.id
-                                                            "
-                                                        >
-                                                            <Avatar
-                                                                :src="
-                                                                    __BASE_URL__ +
-                                                                    message
-                                                                        .participant
-                                                                        .avatar
-                                                                "
-                                                            />
-                                                        </template>
-                                                    </Row>
-                                                </template>
-                                            </Column>
-                                        </div>
-                                    </Column>
-                                    <template #footer>
-                                        <form @submit="submit">
-                                            <Input
-                                                :placeholder="'Сообщение..'"
-                                                v-model="message"
-                                                full-width
-                                            />
-                                        </form>
-                                    </template>
-                                </Card>
                             </Row>
                         </Column>
                     </Column>
@@ -869,6 +907,10 @@ const navigateToHome = () => {
 </template>
 
 <style scoped lang="css">
+.with-border {
+    border: 2px solid green;
+}
+
 .default-button {
     fill: white; /* Устанавливаем белый цвет */
     transition: filter 0.2s ease; /* Плавное изменение яркости */
@@ -921,6 +963,8 @@ const navigateToHome = () => {
 }
 
 .notification {
+    width: 100%;
+    max-width: 300px;
     position: fixed;
     bottom: 20px;
     left: 20px;
@@ -960,7 +1004,7 @@ html {
     /* box-shadow: inset 0 -10rem 10rem 10rem red; */
     box-shadow: inset 0 -3rem 4rem 4.5rem var(--qwarz-dark-secondary);
     max-height: 900px;
-    max-width: 1800px;
+    width: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -32,23 +32,23 @@ const emit = defineEmits([
 
 <template>
     <template v-if="mediaRows && mediaRows?.[0]?.length > 0">
-        <Card :material="material" :with-padding="false">
+        <Card :material="material" :with-padding="false" full-width style="padding: 0 32px;">
         <Column class="padding" :gap="'32'" :align="'start'" :justify="'start'">
             <Typography :size="'xl'" :weight="600" class="media-padding">
                 <slot></slot>
             </Typography>
-            <Column  :gap="'32'">
+            <Column  :gap="'32'" full-width>
                 <template v-for="medias in mediaRows">
                     <template v-if="medias.length > 0">
                         <div class="row">
-                            <Row :gap="'16'" class="media-overflow media-padding">
+                            <Row :gap="'16'" full-width class="media-overflow media-padding">
                                 <template v-for="media in medias" :key="media.id">
                                     <MediaCard :media="media" @click="selectMedia(media)" />
                                 </template>
                             </Row>
                         </div>
                         <template v-if="selectedMedia && isMediaIdMatchesToMediaRow(selectedMedia.id, medias)">
-                            <div class="media-padding">
+                            <div class="media-padding" style="width: 100%;">
                                 <MediaDetailsCard @icon-click="emit('addMedia', $event)" :media="selectedMedia" :genres="selectedMedia?.genres" />
                             </div>
                         </template>

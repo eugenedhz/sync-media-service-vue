@@ -6,7 +6,7 @@ import {
     CardContainerWithImage,
     Row,
     Typography,
-    Card,
+    Button,
     Tag
 } from '@/shared/ui';
 import { __BASE_URL__ } from '@/shared/config/environment'
@@ -38,9 +38,17 @@ const emit = defineEmits([
                 <Typography :align="'start'" :size="'xl'" :weight="600">
                     {{ media?.name }}
                 </Typography>
-                <Row :gap="'8'">
+                <Row
+                    :gap="'8'"
+                    full-width
+                    style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 8px;
+                    "
+                >
                     <template v-for="genre in genres" :key="genre.id">
-                        <Tag :size="'sm'">
+                        <Tag :size="'sm'" style="flex: 0 1 auto;">
                             <Typography
                                 :weight="600"
                                 :color="'pale'"
@@ -55,7 +63,14 @@ const emit = defineEmits([
                 </Typography>
             </Column>
             <Row>
-                <Plus v-if="route.name === Routes.ROOM" @click="emit('iconClick', media)" class="pointer" />
+                <Button
+                    v-if="route.name === Routes.ROOM"
+                    full-width
+                    style="max-width: 57px; max-height: 48px; height: 100%;"
+                    @click="emit('iconClick', media)"
+                >
+                    <Plus style="fill: black; position: relative; right: 6px; top: -1px;"/>
+                </Button>
             </Row>
         </Row>
     </CardContainerWithImage>

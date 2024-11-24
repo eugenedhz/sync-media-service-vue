@@ -4,6 +4,7 @@ import { Room } from '../../model/types/room';
 import RoomCard from '../RoomCard/RoomCard.vue';
 import { Row, Button } from '@/shared/ui';
 import Delete from '@/shared/assets/icons/delete.svg?component';
+import Edit from '@/shared/assets/icons/edit.svg?component';
 import { useDeleteRoomApi, RoomWithParticipants } from '../../api/requests';
 
 defineProps({
@@ -18,7 +19,8 @@ defineProps({
 
 const emit = defineEmits([
     'room-click',
-    'deleted-room'
+    'deleted-room',
+    'update-room'
 ]);
 
 const roomDeleteApi = useDeleteRoomApi();
@@ -31,8 +33,12 @@ const deleteRoom = (room: Room | undefined) => {
             }
         })
 
-        emit('deleted-room')
+        emit('deleted-room', room)
     }
+}
+
+const updateRoom = (room: Room | undefined) => {
+    emit('update-room', room)
 }
 </script>
 
@@ -44,6 +50,10 @@ const deleteRoom = (room: Room | undefined) => {
 
                 <Button full-width :variant="'cleared'" v-if="isUserProfile" @click="deleteRoom(room)" class="left-up">
                     <Delete class="default-button"/>
+                </Button>
+
+                <Button full-width :variant="'cleared'" v-if="isUserProfile" @click="updateRoom(room)" class="left-up2">
+                    <Edit class="default-button2"/>
                 </Button>
             </div>
         </template>
@@ -57,6 +67,26 @@ const deleteRoom = (room: Room | undefined) => {
     right: 0;
     max-width: 54px;
     transform: translate(0, 0);
+}
+
+.left-up2 {
+    position: absolute;
+    top: -1px;
+    right: 26px;
+    max-width: 54px;
+    transform: translate(0, 0);
+}
+
+.default-button2 {
+    transition: filter 0.2s ease; /* Плавное изменение яркости */
+}
+
+.default-button2:hover {
+    filter: brightness(0.8); /* Затемняем на 40% при нажатии */
+}
+
+.default-button2:active {
+    filter: brightness(0.6); /* Затемняем на 40% при нажатии */
 }
 
 .default-button {

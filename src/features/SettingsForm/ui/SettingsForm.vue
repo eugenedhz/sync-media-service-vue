@@ -128,6 +128,7 @@ onUnmounted(() => {
     <Card
         :material="'qwartz-primary'"
         full-width
+        style="padding: 0 32px;"
     >
         <template #header>
             <Row full-width>
@@ -175,7 +176,7 @@ onUnmounted(() => {
                                     <FileInput
                                         fullWidth
                                         v-model="settingsFormStore.avatar"
-                                        accept=".jpg"
+                                        :acceptFile="'.jpg'"
                                         class="hidden-input"
                                         @change="handleFileInputChange"
                                     />

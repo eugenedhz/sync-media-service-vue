@@ -173,7 +173,7 @@ const copyToClipboard = () => {
                             style="
                                 width: 100%;
                                 height: 100%;
-                                max-width: 300px;
+                                max-width: 500px;
                                 max-height: 500px;
                                 padding-top: 30px;
                                 overflow: hidden;
@@ -278,7 +278,6 @@ const copyToClipboard = () => {
                             class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
                             style="
                                 width: 100%;
-                                max-width: 1510px;
                                 padding-top: 30px;
                                 overflow: hidden;
                                 transition: all;

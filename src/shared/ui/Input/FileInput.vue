@@ -27,6 +27,10 @@ const props = defineProps({
     type: {
         type: String,
         default: 'file'
+    },
+    acceptFile: {
+        type: String,
+        default: '.jpg'
     }
 });
 
@@ -42,6 +46,7 @@ const classes = computed(() => ({
             :class="classes"
             :placeholder="placeholder"
             :type="type"
+            :accept="acceptFile"
             @blur="$emit('blur')"
             @focus="$emit('focus')"
             
