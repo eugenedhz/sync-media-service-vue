@@ -102,7 +102,6 @@ onUnmounted(() => {
                         <!-- Видимый FileInput -->
                         <FileInput
                             v-model="updateRoomFormStore.cover"
-                            accept=".jpg"
                             full-width
                             @change="handleFileInputChange"
                         />

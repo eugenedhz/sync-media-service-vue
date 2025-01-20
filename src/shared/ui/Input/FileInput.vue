@@ -30,7 +30,7 @@ const props = defineProps({
     },
     acceptFile: {
         type: String,
-        default: '.jpg'
+        default: '.jpg, .jpeg, .JPG, .JPEG'
     }
 });
 

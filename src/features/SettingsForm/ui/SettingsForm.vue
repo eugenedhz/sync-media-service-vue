@@ -176,7 +176,6 @@ onUnmounted(() => {
                                     <FileInput
                                         fullWidth
                                         v-model="settingsFormStore.avatar"
-                                        :acceptFile="'.jpg'"
                                         class="hidden-input"
                                         @change="handleFileInputChange"
                                     />

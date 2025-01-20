@@ -4,12 +4,20 @@ import { Page } from '@/widgets/Page';
 import {
     useGetUserApi,
     useUserStore,
+    useFriendsApi,
+    User,
+    useGetFriendsStatusApi,
+    useCancelFriendRequestApi,
+    useRejectFriendRequestApi,
+    useDeleteFriendApi,
+    useAddFriendApi
+
 } from '@/entities/User';
 import { __BASE_URL__ } from '@/shared/config/environment';
 import { MediaGrid } from '@/features/MediaGrid';
 import { fetchAllMedias, MediaWithGenres } from '@/entities/Media/api/requests';
 import { RoomCardList, RoomCard, useGetAllRoomsApi, Room, useGetRoomApi } from '@/entities/Room';
-import { Column, Typography, Row, Avatar, Card } from '@/shared/ui';
+import { Column, Typography, Row, Avatar, Card, Button } from '@/shared/ui';
 import { useRouter, useRoute } from 'vue-router';
 import { Routes } from '@/shared/consts/router';
 import { SearchBar } from '@/widgets/SearchBar'
@@ -30,6 +38,12 @@ const genreApi = useGetAllGenreApi();
 const roomsApi = useGetAllRoomsApi();
 const getRoomApi = useGetRoomApi();
 const participantApi = useGetAllParticipantsApi();
+const friendsApi = useFriendsApi();
+const friendsStatusApi = useGetFriendsStatusApi(); 
+const cancelFriendApi = useCancelFriendRequestApi(); 
+const rejectFriendApi = useRejectFriendRequestApi(); 
+const deleteFriendApi = useDeleteFriendApi(); 
+const addFriendApi = useAddFriendApi(); 
 
 const router = useRouter();
 const route = useRoute();
@@ -62,6 +76,15 @@ const navigateToRoom = (room: Room) => {
     });
 };
 
+const openProfile = async (user: User) => {
+    router.push({
+        name: Routes.PROFILE,
+        params: {
+            username: user.username
+        }
+    });
+};
+
 const userProfile = ref(false);
 
 onMounted(async () => {
@@ -75,7 +98,21 @@ onMounted(async () => {
         params: {
             username: `${route.params.username}`
         }
-    }); 
+    });
+
+    await friendsApi.initiate(undefined, {
+        params: {
+            id: userApi.data?.id
+        }
+    });
+
+    if (!userProfile.value) {
+        await friendsStatusApi.initiate(undefined, {
+            params: {
+                user_id: userApi.data?.id
+            }
+        })
+    }
 
     await roomsApi.initiate(undefined, {
         params: {
@@ -101,6 +138,20 @@ watch(() => route.params.username, async (newUsername) => {
             username: newUsername
         }
     });
+
+    await friendsApi.initiate(undefined, {
+        params: {
+            id: userApi.data?.id
+        }
+    }); 
+
+    if (!userProfile.value) {
+        await friendsStatusApi.initiate(undefined, {
+            params: {
+                user_id: userApi.data?.id
+            }
+        })
+    }
 
     await fetchUserCurrentRoom()
 
@@ -172,6 +223,82 @@ const handleUpdated = async (room: Room) => {
         await fetchUserCurrentRoom()
     }
 }
+
+const searchBarKey = ref(0);
+
+const reloadSearchBar = () => {
+    searchBarKey.value += 1; // Changing the key will remount the SearchBar
+};
+
+const handleFriendAction = async () => {
+    await friendsApi.initiate(undefined, {
+        params: {
+            id: userApi.data?.id
+        }
+    }); 
+    await friendsStatusApi.initiate(undefined, {
+        params: {
+            user_id: userApi.data?.id
+        }
+    })
+}
+
+const friendAction = async (action: string = "none") => {
+    let isActionCompleted = false;
+
+    if (friendsStatusApi.data?.status === "REQUEST_SENT") {
+        await cancelFriendApi.initiate(undefined, {
+            params: {
+                friend_id: userApi.data?.id
+            }
+        })
+        isActionCompleted = true
+    } else if (friendsStatusApi.data?.status === "NO_REQUEST") {
+        await addFriendApi.initiate(undefined, {
+            params: {
+                friend_id: userApi.data?.id
+            }
+        })
+        isActionCompleted = true
+    } else if (friendsStatusApi.data?.status === "FRIENDS") {
+        await deleteFriendApi.initiate(undefined, {
+            params: {
+                friend_id: userApi.data?.id
+            }
+        })
+        isActionCompleted = true
+    } else if (friendsStatusApi.data?.status === "REQUEST_RECEIVED" && action === "add") {
+        await addFriendApi.initiate(undefined, {
+            params: {
+                friend_id: userApi.data?.id
+            }
+        })
+        isActionCompleted = true
+    } else if (friendsStatusApi.data?.status === "REQUEST_RECEIVED" && action === "reject") {
+        await rejectFriendApi.initiate(undefined, {
+            params: {
+                friend_id: userApi.data?.id
+            }
+        })
+        isActionCompleted = true
+    }
+
+    if (isActionCompleted = true) {
+        reloadSearchBar()
+        await friendsApi.initiate(undefined, {
+            params: {
+                id: userApi.data?.id
+            }
+        }); 
+
+        await friendsStatusApi.initiate(undefined, {
+            params: {
+                user_id: userApi.data?.id
+            }
+        })
+    }
+}
+
 </script>
 
 <template>
@@ -251,82 +378,81 @@ const handleUpdated = async (room: Room) => {
     <div class="background">
         <Page>
             <Column :align="'start'" :gap="'32'" class="padding">
-                <SearchBar/>
-                    <Card
-                        qwartz-primary
-                        full-width
-                    >
-                    <template #header>
-                        <Row full-width>
-                            <Typography
-                                :weight="600"
-                                :size="'xl'"
-                                v-if="userApi.data?.id !== userStore.authData?.id"
-                            >
-                                Профиль
-                            </Typography>
-                            <Typography
-                                :weight="600"
-                                :size="'xl'"
-                                v-if="userApi.data?.id === userStore.authData?.id"
-                            >
-                                Ваш профиль
-                            </Typography>
-                        </Row>
-                    </template>
-                        <Row :align="'stretch'" :gap="'16'" style="margin-bottom: 32px;">
-                            <template v-if="userApi?.data">
-                                <Row :gap="'32'" full-width>
-                                    <Card
-                                        :padding="'none'"
-                                        style="max-width: 550px;"
-                                        full-width
-                                    >
-                                        <Row
-                                            :align="'start'"
-                                            :justify="'between'"
-                                            :gap="'16'"
+                <SearchBar :key="searchBarKey" @friend-action="handleFriendAction"/>
+                    <Row :gap="'16'" full-width style="align-items: stretch;">
+                        <Card
+                            qwartz-primary
+                            full-width
+                            style="flex: 4;"
+                        >
+                        <template #header>
+                            <Row full-width>
+                                <Typography
+                                    :weight="600"
+                                    :size="'xl'"
+                                    v-if="userApi.data?.id !== userStore.authData?.id"
+                                >
+                                    Профиль
+                                </Typography>
+                                <Typography
+                                    :weight="600"
+                                    :size="'xl'"
+                                    v-if="userApi.data?.id === userStore.authData?.id"
+                                >
+                                    Ваш профиль
+                                </Typography>
+                            </Row>
+                        </template>
+                            <Row :align="'stretch'" :gap="'16'" style="margin-bottom: 32px;">
+                                <template v-if="userApi?.data">
+                                    <Row :gap="'32'" full-width>
+                                        <Card
+                                            :padding="'none'"
+                                            style="max-width: 550px;"
+                                            full-width
                                         >
-                                            <div>
-                                                <Avatar
-                                                    :width="'200'"
-                                                    :height="'200'"
-                                                    :src="__BASE_URL__ + userApi.data.avatar"
-                                                />
-                                            </div>
-                                            <Column
+                                            <Row
                                                 :align="'start'"
-                                                :justify="'start'"
-                                                full-width
-                                                style="padding-top: 8px;"
+                                                :justify="'between'"
+                                                :gap="'16'"
                                             >
+                                                <div>
+                                                    <Avatar
+                                                        :width="'200'"
+                                                        :height="'200'"
+                                                        :src="__BASE_URL__ + userApi.data.avatar"
+                                                    />
+                                                </div>
                                                 <Column
                                                     :align="'start'"
                                                     :justify="'start'"
-                                                    style="padding-bottom: 16px;"
+                                                    full-width
+                                                    style="padding-top: 8px;"
                                                 >
-                                                    <Typography
-                                                        :size="'xl'"
-                                                        :weight="600"
-                                                        :align="'center'"
+                                                    <Column
+                                                        :align="'start'"
+                                                        :justify="'start'"
+                                                        style="padding-bottom: 16px;"
                                                     >
-                                                        {{ userApi.data.displayName }}
-                                                    </Typography>
-                                                    <Typography
-                                                        :size="'sm'"
-                                                        :weight="400"
-                                                        :align="'center'"
-                                                        :color="'green'"
-                                                    >
-                                                        @{{ userApi.data.username }}
-                                                    </Typography>
-                                                </Column>
-                                                <Row
-                                                    :align="'start'"
-                                                    :justify="'start'"
-                                                >
-                                                    <template
-                                                        v-if="userApi.data.description !== null"
+                                                        <Typography
+                                                            :size="'xl'"
+                                                            :weight="600"
+                                                            :align="'center'"
+                                                        >
+                                                            {{ userApi.data.displayName }}
+                                                        </Typography>
+                                                        <Typography
+                                                            :size="'sm'"
+                                                            :weight="400"
+                                                            :align="'center'"
+                                                            :color="'green'"
+                                                        >
+                                                            @{{ userApi.data.username }}
+                                                        </Typography>
+                                                    </Column>
+                                                    <Row
+                                                        :align="'start'"
+                                                        :justify="'start'"
                                                     >
                                                         <Typography
                                                             :size="'md'"
@@ -340,114 +466,254 @@ const handleUpdated = async (room: Room) => {
                                                             :size="'md'"
                                                             :weight="500"
                                                             :align="'start'"
+                                                            v-if="userApi.data.description !== null"
                                                         >
                                                             {{ userApi.data.description }}
                                                         </Typography>
-                                                    </template>
-                                                </Row>
-                                            </Column>
-                                        </Row>
-                                    </Card>
-                                    <Card
-                                        qwartz-primary
-                                        full-width
-                                        style="max-height: 200px; height: 100%;"
-                                    >
-                                    <template #header>
-                                        <Row full-width>
-                                            <Typography
-                                                :weight="600"
-                                                :size="'xl'"
-                                            >
-                                                Сейчас в комнате
-                                            </Typography>
-                                        </Row>
-                                    </template>
-                                        <Row :justify="'center'" :align="'center'" full-width full-height style="max-height: 105px;">
-                                            <RoomCard :room="getRoomApi.data" v-if="getRoomApi.data" @click="navigateToRoom(getRoomApi.data)"/>
-                                            <Typography
-                                                :weight="500"
-                                                :size="'lg'"
-                                                :align="'center'"
-                                                :color="'pale'"
-                                                v-if="!getRoomApi.data && userApi.data?.id !== userStore.authData?.id"
-                                            >
-                                                {{ userApi.data?.displayName }} пока никуда не зашёл(
-                                            </Typography>
+                                                    </Row>
 
-                                            <Typography
-                                                :weight="500"
-                                                :size="'lg'"
-                                                :align="'center'"
-                                                :color="'pale'"
-                                                v-if="!getRoomApi.data && userApi.data?.id === userStore.authData?.id"
-                                            >
-                                                вы пока никуда не зашли(
-                                            </Typography>
-                                        </Row>
-                                    </Card>
-                                </Row>
-                            </template>
-                        </Row>
-                        <Card full-width>
-                            <template #header>
-                                <Row full-width>
+                                                    <Button
+                                                        style="
+                                                            align-self: flex-end;
+                                                            margin-top: 36px;
+                                                            margin-right: 16px;
+                                                        "
+                                                        @click="friendAction"
+                                                        v-if="!userProfile && friendsStatusApi.data?.status !== 'REQUEST_RECEIVED'"
+                                                    >
+                                                        <Typography
+                                                            v-if="friendsStatusApi.data?.status === 'NO_REQUEST'"
+                                                            :color="'inverted'"
+                                                        >
+                                                            Добавить в друзья
+                                                        </Typography>
+
+                                                        <Typography
+                                                            v-if="friendsStatusApi.data?.status === 'FRIENDS'"
+                                                            :color="'inverted'"
+                                                        >
+                                                            Удалить из друзей
+                                                        </Typography>
+
+                                                        <Typography
+                                                            v-if="friendsStatusApi.data?.status === 'REQUEST_SENT'"
+                                                            :color="'inverted'"
+                                                        >
+                                                            Отменить запрос
+                                                        </Typography>
+                                                    </Button>
+
+                                                    <Row
+                                                        style="
+                                                            align-self: center;
+                                                            margin-top: 32px;
+                                                        "
+                                                        v-if="!userProfile && friendsStatusApi.data?.status === 'REQUEST_RECEIVED'"
+                                                        :gap="'4'"
+                                                    >
+                                                        <Button
+                                                            @click="friendAction('add')"
+                                                        >
+                                                            <Typography
+                                                                :color="'inverted'"
+                                                                :size="'sm'"
+                                                            >
+                                                                Принять запрос
+                                                            </Typography>
+                                                        </Button>
+
+                                                        <Button
+                                                            @click="friendAction('reject')"
+                                                        >
+                                                            <Typography
+                                                                :color="'inverted'"
+                                                                :size="'sm'"
+                                                            >
+                                                                Отклонить запрос
+                                                            </Typography>
+                                                        </Button>
+                                                    </Row>
+                                                </Column>
+                                            </Row>
+                                        </Card>
+                                        <Card
+                                            qwartz-primary
+                                            full-width
+                                            style="max-height: 200px; height: 100%;"
+                                        >
+                                        <template #header>
+                                            <Row full-width>
+                                                <Typography
+                                                    :weight="600"
+                                                    :size="'xl'"
+                                                >
+                                                    Сейчас в комнате
+                                                </Typography>
+                                            </Row>
+                                        </template>
+                                            <Row :justify="'center'" :align="'center'" full-width full-height style="max-height: 105px;">
+                                                <RoomCard :room="getRoomApi.data" v-if="getRoomApi.data" @click="navigateToRoom(getRoomApi.data)"/>
+                                                <Typography
+                                                    :weight="500"
+                                                    :size="'lg'"
+                                                    :align="'center'"
+                                                    :color="'pale'"
+                                                    v-if="!getRoomApi.data && userApi.data?.id !== userStore.authData?.id"
+                                                >
+                                                    Где же {{ userApi.data?.displayName }}??!
+                                                </Typography>
+
+                                                <Typography
+                                                    :weight="500"
+                                                    :size="'lg'"
+                                                    :align="'center'"
+                                                    :color="'pale'"
+                                                    v-if="!getRoomApi.data && userApi.data?.id === userStore.authData?.id"
+                                                >
+                                                    Вы пока никуда не зашли(
+                                                </Typography>
+                                            </Row>
+                                        </Card>
+                                    </Row>
+                                </template>
+                            </Row>
+                            <Card full-width style="height: 190px;">
+                                <template #header>
+                                    <Row full-width>
+                                        <Typography
+                                            :weight="600"
+                                            :size="'xl'"
+                                            v-if="userApi.data?.id !== userStore.authData?.id"
+                                        >
+                                            Созданные комнаты
+                                        </Typography>
+                                        <Typography
+                                            :weight="600"
+                                            :size="'xl'"
+                                            v-if="userApi.data?.id === userStore.authData?.id"
+                                        >
+                                            Ваши комнаты
+                                        </Typography>
+                                    </Row>
+                                </template>
+                                <div
+                                    class="ilow-scroll room-overflow"
+                                    style="width: 100%;"
+                                    v-if="
+                                            roomsApi?.data && roomsApi.data.length > 0
+                                        "
+                                >
+                                    <RoomCardList
+                                        @room-click="navigateToRoom($event)"
+                                        class="padding-left"
+                                        :rooms="roomsApi?.data"
+                                        :isUserProfile="userProfile"
+                                        @deleted-room="handleDeleteRoom($event)"
+                                        @update-room="handleUpdateRoom($event)"
+                                    />
+                                </div>
+                                <Row :justify="'center'" :align="'center'" full-width full-height style="max-height: 105px;">
                                     <Typography
-                                        :weight="600"
-                                        :size="'xl'"
-                                        v-if="userApi.data?.id !== userStore.authData?.id"
+                                        :weight="500"
+                                        :size="'lg'"
+                                        :align="'center'"
+                                        :color="'pale'"
+                                        v-if="
+                                            roomsApi.data?.length === 0 && userApi.data?.id !== userStore.authData?.id
+                                        "
                                     >
-                                        Созданные комнаты от {{ userApi.data?.displayName }}
+                                        Грустно, у {{ userApi.data?.displayName }} нет комнат(
                                     </Typography>
                                     <Typography
-                                        :weight="600"
-                                        :size="'xl'"
-                                        v-if="userApi.data?.id === userStore.authData?.id"
+                                        :weight="500"
+                                        :size="'lg'"
+                                        :align="'center'"
+                                        :color="'pale'"
+                                        v-if="
+                                            roomsApi.data?.length === 0 && userApi.data?.id === userStore.authData?.id
+                                        "
                                     >
-                                        Ваши комнаты
+                                        Грустно, вы ещё ничего не добавили(
                                     </Typography>
                                 </Row>
-                            </template>
-                            <div
-                                class="ilow-scroll room-overflow"
-                                style="width: 100%;"
-                                v-if="
-                                        roomsApi?.data && roomsApi.data.length > 0
-                                    "
-                            >
-                                <RoomCardList
-                                    @room-click="navigateToRoom($event)"
-                                    class="padding-left"
-                                    :rooms="roomsApi?.data"
-                                    :isUserProfile="userProfile"
-                                    @deleted-room="handleDeleteRoom($event)"
-                                    @update-room="handleUpdateRoom($event)"
-                                />
-                            </div>
-                            <Typography
-                                :weight="500"
-                                :size="'lg'"
-                                :align="'center'"
-                                :color="'pale'"
-                                v-if="
-                                    roomsApi.data?.length === 0 && userApi.data?.id !== userStore.authData?.id
-                                "
-                            >
-                                грустно, {{ userApi.data?.displayName }} ещё ничего не добавил(
-                            </Typography>
-                            <Typography
-                                :weight="500"
-                                :size="'lg'"
-                                :align="'center'"
-                                :color="'pale'"
-                                v-if="
-                                    roomsApi.data?.length === 0 && userApi.data?.id === userStore.authData?.id
-                                "
-                            >
-                                грустно, вы ещё ничего не добавили(
-                            </Typography>
+                            </Card>
                         </Card>
-                    </Card>
+                        <Card
+                            qwartz-primary
+                            full-width
+                            style="flex: 1;"
+                        >
+                            <template #header>
+                                <Row full-width :justify="'between'">
+                                    <Typography
+                                        :weight="600"
+                                        :size="'xl'"
+                                    >
+                                        Друзья
+                                    </Typography>
+
+                                    <Typography
+                                        :weight="400"
+                                        :size="'lg'"
+                                        :color="'pale'"
+                                        v-if="friendsApi.data"
+                                    >
+                                        {{ friendsApi.data.length }}
+                                    </Typography>
+
+                                    <Typography
+                                        :weight="400"
+                                        :size="'lg'"
+                                        :align="'end'"
+                                        :color="'pale'"
+                                        v-if="!friendsApi.data"
+                                    >
+                                        0
+                                    </Typography>
+                                </Row>
+                            </template>
+
+                            <div
+                                style="
+                                    overflow-y: auto;
+                                    height: 421px;
+                                "
+                                class="ilow-scroll"
+                            >
+                                <Column
+                                        :align="'stretch'"
+                                        :gap="'8'"
+                                    >
+                                    <template v-for="user in friendsApi.data">
+                                        <Card
+                                            :padding="'none'"
+                                            @click="openProfile(user)"
+                                            style="cursor: pointer;"
+                                            class="participant"
+                                        >
+                                            <Row full-width :gap="'16'">
+                                                <div>
+                                                    <Avatar
+                                                        :width="'73'"
+                                                        :height="'73'"
+                                                        :src="
+                                                            __BASE_URL__ + user.avatar
+                                                        "
+                                                    />
+                                                </div>
+
+                                                <Typography
+                                                    :weight="600"
+                                                >
+                                                    {{ user.displayName }}
+                                                </Typography>
+                                            </Row>
+                                        </Card>
+                                    </template>
+                                </Column>
+                            </div>
+                        </Card>
+                    </Row>
             </Column>
         </Page>
         <div class="dark">
@@ -461,7 +727,7 @@ const handleUpdated = async (room: Room) => {
 <style scoped lang="css">
 @import url('@/app/styles/scrollbar.css');
 .background {
-    background:  linear-gradient(135deg, #000000, #03228f);
+    background:  linear-gradient(135deg, #000000, #3e0646);
 }
 
 .dark {
@@ -476,5 +742,17 @@ const handleUpdated = async (room: Room) => {
 .padding {
     padding: 16px 32px;
     padding-top: 0;
+}
+
+.participant {
+    transition: filter 0.2s ease;
+}
+
+.participant:hover {
+    filter: brightness(0.8); /* Затемняем на 40% при нажатии */
+}
+
+.participant:active {
+    filter: brightness(0.6); /* Затемняем на 40% при нажатии */
 }
 </style>

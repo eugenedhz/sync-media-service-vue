@@ -3,7 +3,7 @@ import { onMounted, onBeforeUnmount, ref, nextTick, provide } from 'vue';
 import { socketService } from '@/shared/api';
 import { useRoute, useRouter } from 'vue-router';
 import { Routes } from '@/shared/consts/router';
-import { useUserStore, useGetUserApi } from '@/entities/User';
+import { useUserStore, useGetUserApi, useGetCreatorApi } from '@/entities/User';
 import {
     useGetAllPlaylistMediaApi,
     Media,
@@ -174,7 +174,7 @@ function truncate(text: string, length: number) {
     return text;
 }
 
-const getCreatorApi = useGetUserApi();
+const getCreatorApi = useGetCreatorApi();
 
 
 onMounted(async () => {

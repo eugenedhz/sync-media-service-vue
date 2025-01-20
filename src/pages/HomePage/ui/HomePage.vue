@@ -99,7 +99,7 @@ onMounted(async () => {
 <style scoped lang="css">
 @import url('@/app/styles/scrollbar.css');
 .background {
-    background:  linear-gradient(135deg, #000000, #03228f);
+    background:  linear-gradient(135deg, #000000, #240c4d);
 }
 
 .dark {

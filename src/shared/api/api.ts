@@ -35,8 +35,6 @@ api.interceptors.response.use(
 
                 return api.request(originalRequest);
             } catch (e) {
-                localStorage.clear()
-                return api.request(originalRequest);
             }
         }
         
