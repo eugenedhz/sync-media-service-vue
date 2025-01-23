@@ -412,7 +412,7 @@ const addFriend = async (user: User) => {
 
     <Row :gap="'16'" full-width>
         <div @click="navigateToHome()">
-            <Logo />
+            <Logo class="btn" style="cursor: pointer;"/>
         </div>
         <Input
             @click="setIsOpen(true)"
