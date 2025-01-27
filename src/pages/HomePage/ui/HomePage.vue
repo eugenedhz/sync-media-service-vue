@@ -77,7 +77,7 @@ onMounted(async () => {
                         <div class="ilow-scroll room-overflow" style="width: 100%;">
                             <RoomCardList
                                 v-if="
-                                    roomsApi?.data && roomsApi.data.length > 10
+                                    roomsApi?.data && roomsApi.data.length > 0
                                 "
                                 @room-click="navigateToRoom($event)"
                                 class="padding-left"
