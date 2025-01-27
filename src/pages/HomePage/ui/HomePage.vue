@@ -70,6 +70,7 @@ onMounted(async () => {
                                     :weight="600"
                                     :size="'xl'"
                                     :huina="'xl'"
+                                    :novaya="'sm'"
                                 >
                                     Недавно добавленные комнаты
                                 </Typography>
