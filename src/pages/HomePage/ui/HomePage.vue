@@ -69,8 +69,6 @@ onMounted(async () => {
                                 <Typography
                                     :weight="600"
                                     :size="'xl'"
-                                    :huina="'xl'"
-                                    :novaya="'sm'"
                                 >
                                     Недавно добавленные комнаты
                                 </Typography>
@@ -79,7 +77,7 @@ onMounted(async () => {
                         <div class="ilow-scroll room-overflow" style="width: 100%;">
                             <RoomCardList
                                 v-if="
-                                    roomsApi?.data && roomsApi.data.length > 0
+                                    roomsApi?.data && roomsApi.data.length > 10
                                 "
                                 @room-click="navigateToRoom($event)"
                                 class="padding-left"
