@@ -38,6 +38,6 @@ repos:
 
 Denya Sar
 
-### Mazafaker / Backend Tech Lead / Guru Python-Go-Ruby Senior / Zhena
+### Mazafaker / Backend Tech Lead / Guru Python-Go-Ruby Senior / Junior Typescript/Vue / Zhena
 
 Zhenya Tor
