@@ -34,6 +34,6 @@ repos:
 ### create own rooms
 <img width="1383" alt="image" src="https://github.com/user-attachments/assets/b0d37c81-f898-4bdc-9ba1-8c24bb7dbfdd" />
 
-### Managar / Team Lead / FapTech / Dolbaeb
+### Managar / Team Lead / FapTech / Dolbaeb ?? ООО "Гудфелас"
 
 Denya Sar
