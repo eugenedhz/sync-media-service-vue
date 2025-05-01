@@ -37,3 +37,7 @@ repos:
 ### Managar / Team Lead / FapTech / Dolbaeb ?? ООО "Гудфелас"
 
 Denya Sar
+
+### Mazafaker / Backend Tech Lead / Guru Python-Go-Ruby Senior / Zhena
+
+Zhenya Tor
