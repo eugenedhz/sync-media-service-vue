@@ -34,10 +34,14 @@ repos:
 ### create own rooms
 <img width="1383" alt="image" src="https://github.com/user-attachments/assets/b0d37c81-f898-4bdc-9ba1-8c24bb7dbfdd" />
 
-### Managar / Team Lead / FapTech / Dolbaeb ?? ООО "Гудфелас"
+### Managar / Team Lead / FapTech / Dolbaeb / VibeCODER)) ?? ООО "Гудфелас"
 
 Denya Sar
 
-### Mazafaker / Backend Tech Lead / Guru Python-Go-Ruby Senior / Junior Typescript/Vue / Zhena
+### Mazafaker / Backend Tech Lead / Slave-Monkey / Junior Typescript/Vue / Zhena ?? ООО "Ломатхле"
 
 Zhenya Tor
+
+### Founder
+
+Alexsashsa
